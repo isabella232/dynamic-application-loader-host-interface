@@ -47,7 +47,7 @@ namespace intel_dal
 		_xmlReader = XmlReaderFactory::createInstance(JHI_DALP_VALIDATION_SCHEMA);
 		if (NULL == _xmlReader)
 		{
-			TRACE0("Failed to receive IXmlReader instance\n");
+			TRACE0("Failed to receive IXmlReader instance.\n");
 			_packageValid = false;
 		}
 		else
@@ -154,33 +154,35 @@ namespace intel_dal
 		string platformName = getPlatformName();
 		if (platformName == INVALID_PLATFORM_NAME)
 		{
+			TRACE0("AppletsPackageReader::getAppletBlobs: Invalid platform name in dalp file.");
 			return false;
 		}
 
 		if (!_packageValid)
 			return false;
 
+		// get the number of applet blobs in the dalp
 		string platformXPath = string("//applets/applet[normalize-space(platform) = \"") + platformName + string("\"]");
 		numAppletRecords = _xmlReader->GetNodeCount(platformXPath);
 
 		if (numAppletRecords < 1)
 		{
-			TRACE0("no applets records in DALP file match the current platform\n");
+			TRACE0("No applets records in dalp file match the current platform.\n");
 			return false;
 		}
 
-		//check if we're "SIGN_ONCE" or not
+		// check if we're "SIGN_ONCE" or not
 		status = isSignOnce(fwVersion, isSignOnceSupported);
 		if (status != JHI_SUCCESS)
 		{
-			TRACE0("getAppletBlobs(): isSignOnce() failed\n");
+			TRACE0("getAppletBlobs(): isSignOnce() failed.\n");
 			return false;
 		}
 
-		//sign once procedure.
+		// sign once procedure.
 		if (isSignOnceSupported)
 		{
-			ret = getSignOnceAppletBlobs(fwVersion, blobsList);
+			ret = getSignOnceAppletBlobs(blobsList);
 		}
 
 		//non sign once procedure.
@@ -199,14 +201,14 @@ namespace intel_dal
 		std::istringstream appVersionStream(appletVersionString);
 		appVersionStream >> version->appVersion.majorVersion >> c1 >> version->appVersion.minorVersion;
 		if (appVersionStream.fail()) {
-			TRACE0("invalid applet version in dalp file\n");
+			TRACE0("Invalid applet version in dalp file.\n");
 			return false;
 		}
 
 		std::istringstream fwVersionStream(fwVersionString);
 		fwVersionStream >> version->fwVersion.Major >> c1 >> version->fwVersion.Minor >> c2 >> version->fwVersion.Hotfix;
 		if (fwVersionStream.fail()) {
-			TRACE0("invalid fw version in dalp file\n");
+			TRACE0("Invalid fw version in dalp file.\n");
 			return false;
 		}
 
@@ -296,38 +298,66 @@ namespace intel_dal
 
 		return ret;
 	}
+	
+	
+	int AppletsPackageReader::getSignOnceDalpSigningVersion()
+	{
+		switch (GlobalsManager::Instance().getSigVersion())
+		{
+			case SIGNING_VERSION_2K_KEY: // sign once 2K key
+				return SIGN_ONCE_2K_KEY_DALP_VERSION;
+			case SIGNING_VERSION_3K_KEY: // sign once 3K key
+				return SIGN_ONCE_3K_KEY_DALP_VERSION;
+			default: // error - this is sign once - only signature versions 1 and 2 are supported.
+				TRACE1("Got wrong signature version from FW: %d.", GlobalsManager::Instance().getSigVersion());
+				return 0;
+		}
+	}
+	
 
-	bool AppletsPackageReader::getSignOnceAppletBlobs(const string& fwVersion, list<vector<uint8_t> >& blobsList)
+	bool AppletsPackageReader::getSignOnceAppletBlobs(list<vector<uint8_t> >& blobsList)
 	{
 
 		bool status = false;
 
 		do
 		{
-			// get all the applets with versions that match the sign once fw version ( 11.x.x )
 			list<APPLET_DETAILS> versionsList;
-			status = getMatchingAppletsToMajorFwVersion(SIGN_ONCE_FW__MAJOR_VERSION, versionsList);
+			int dalpSigningVersion = getSignOnceDalpSigningVersion();
+			
+			TRACE1("The dalpSigningVersion is: %d", dalpSigningVersion);
+			
+			if (dalpSigningVersion == 0)
+				return false;
+
+			// get all the applets with versions that match the dalp signing version ( 11.x.x / 15.x.x)
+			status = getMatchingAppletsToMajorFwVersion(dalpSigningVersion, versionsList);
 
 			if (!status)
 			{
-				TRACE0("failed getting all the applet versions that match the SIGN_ONCE_FW_VERSION\n");
+				TRACE0("Failed to get all the applet versions that match the SIGN_ONCE_FW_VERSION.\n");
 				break;
 			}
 
-			//remove all the apples with an API level that's higher than the one supported on the platform.
+			// remove all the apples with an API level that's higher than the one supported on the platform.
 			status = removeHigherApiLevelApplets(versionsList);
 
 			if (!status)
 			{
-				TRACE0("failed removing higher API level applets from list\n");
+				TRACE0("Failed to remove higher API level applets from list.\n");
+				break;
+			}
+			if (versionsList.empty())
+			{
+				TRACE0("No applet blobs in dalp file match the platform API level.");
 				break;
 			}
 
 			// sort ( only applet version )
 			versionsList.sort(compareAppletVersionsSignOnce);
 
-			//copy all candidate blobs.
-			status = copyBlobsFromList(SIGN_ONCE_FW__MAJOR_VERSION, versionsList, blobsList);
+			// copy all candidate blobs.
+			status = copyBlobsFromList(dalpSigningVersion, versionsList, blobsList);
 			if (!status)
 			{
 				TRACE0("getSignOnceAppletBlobs(): copyBlobsFromList() failed.\n");
@@ -386,12 +416,18 @@ namespace intel_dal
 		string platformName = getPlatformName();
 		if (platformName == INVALID_PLATFORM_NAME)
 		{
+			TRACE0("AppletsPackageReader::getMatchingAppletsToMajorFwVersion: Invalid platform name in dalp file.");
 			return false;
 		}
 
 		// //applets/applet[normalize-space(platform) = "ME" and starts-with(normalize-space(fwVersion),'8.')]
 		string appletVersionsXpath = string("//applets/applet[normalize-space(platform) = \"") + platformName + string("\" and starts-with(normalize-space(fwVersion),\"") + majorVersionStream.str() + string(".\")]");
 		int numAppletRecords = _xmlReader->GetNodeCount(appletVersionsXpath);
+
+		if (numAppletRecords == 0)
+		{
+			TRACE1("No applet blobs if dalp file match the major FW version: %d", majorFwVersion);
+		}
 
 		for (int i = 1; i <= numAppletRecords; i++)
 		{
@@ -410,7 +446,7 @@ namespace intel_dal
 
 			if (!status)
 			{
-				TRACE0("invalid applet record in DALP file\n");
+				TRACE0("Invalid applet record in dalp file - failed to get applet version from dalp file.\n");
 				valid = false;
 				break;
 			}
@@ -419,7 +455,7 @@ namespace intel_dal
 
 			if (!status)
 			{
-				TRACE0("invalid applet record in DALP file\n");
+				TRACE0("Invalid applet record in dalp file - failed to get fw version from dalp file.\n");
 				valid = false;
 				break;
 			}
@@ -427,7 +463,6 @@ namespace intel_dal
 			APPLET_DETAILS version = { { 0, 0 }, { 0, 0, 0, 0 }, 0 };
 			if (!getAppletAndFwVersionAsStruct(&version, appletVersion, fwVersion))
 			{
-				TRACE0("invalid applet version in DALP file\n");
 				valid = false;
 				break;
 			}
@@ -442,23 +477,25 @@ namespace intel_dal
 
 	bool AppletsPackageReader::removeHigherApiLevelApplets(list<APPLET_DETAILS>& appletsList)
 	{
-		int supportedApiLevel = getPlatformApiLevel();
+		int supportedApiLevel = GlobalsManager::Instance().getApiLevel();
 
 		if (supportedApiLevel == INVALID_API_LEVEL)
 		{
 			return false;
 		}
 
-		//we have the supported API level, iterate and remove applets with higher API levels.
+		TRACE1("Suppoted API level in platform: %d", supportedApiLevel);
+
+		// we have the supported API level, iterate and remove applets with higher API levels.
 		auto it = appletsList.begin();
 
 		while (it != appletsList.end())
 		{
-			//get applet's api level
+			// get applet's api level
 			VERSION appletFwVersion = (*it).fwVersion;
 			int appletApiLevel = appletFwVersion.Minor;
 
-			//if it's higher than supported, remove
+			// if it's higher than supported, remove
 			if (appletApiLevel > supportedApiLevel)
 			{
 				it = appletsList.erase(it);
@@ -472,36 +509,6 @@ namespace intel_dal
 		return true;
 	}
 
-	int AppletsPackageReader::getPlatformApiLevel()
-	{
-		VM_Plugin_interface* plugin = NULL;
-		UINT32 status = JHI_UNKNOWN_ERROR;
-		int apiLevel = INVALID_API_LEVEL;
-
-		//input to JHI_Plugin_QueryTeeMetadata
-		unsigned char* metadata = NULL;
-		unsigned int length = 0;
-
-		if ((!GlobalsManager::Instance().getPluginTable(&plugin)) || (plugin == NULL))
-		{
-			TRACE0("getSupportedApiLevel(): getPluginTable() failed.");
-			return INVALID_API_LEVEL;
-		}
-
-		status = plugin->JHI_Plugin_QueryTeeMetadata(&metadata, &length);
-		if (status == TEE_STATUS_SUCCESS)
-		{
-			apiLevel = ((dal_tee_metadata*)metadata)->api_level;
-			JHI_DEALLOC(metadata);
-		}
-		else
-		{
-			TRACE1("getSupportedApiLevel(): JHI_Plugin_QueryTeeMetadata() failed with status = %d", status);
-		}
-
-		return apiLevel;
-	}
-
 	//copy the blobs (in sorted order) to appletsBlobsList.
 	bool AppletsPackageReader::copyBlobsFromList(int fwMajorVersion, list<APPLET_DETAILS>& sortedAppletsList, list<vector<uint8_t> >& appletsBlobsList)
 	{
@@ -513,6 +520,7 @@ namespace intel_dal
 		string platformName = getPlatformName();
 		if (platformName == INVALID_PLATFORM_NAME)
 		{
+			TRACE0("copyBlobsFromList: Invalid platform name in dalp file.");
 			return false;
 		}
 
@@ -534,7 +542,7 @@ namespace intel_dal
 
 			if (!status || appletblob == NULL)
 			{
-				TRACE0("failed reading applet blob from DALP file\n");
+				TRACE0("copyBlobsFromList: Failed to read blob from dalp file.\n");
 				break;
 			}
 

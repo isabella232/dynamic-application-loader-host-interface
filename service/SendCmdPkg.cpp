@@ -134,7 +134,7 @@ JHI_RET_I cmd_pkg_install_jta (string& pAppId, const SD_SESSION_HANDLE handle, v
 	if (TEE_STATUS_IDENTICAL_PACKAGE == ulRetCode) // the applet version is already exists in the VM
 	{
 		// Force re-install:
-		plugin->JHI_Plugin_UnloadApplet(pAppId.c_str());
+		plugin->JHI_Plugin_UnloadApplet(pAppId.c_str(), GlobalsManager::Instance().getSigVersion());
 		ulRetCode = plugin->JHI_Plugin_SendCmdPkg(handle, blob);
 	}
 
@@ -173,7 +173,7 @@ JHI_RET_I cmd_pkg_install_jta (string& pAppId, const SD_SESSION_HANDLE handle, v
 errorDeleteFromFW:
 
 	//call the delete function using the plugin
-	plugin->JHI_Plugin_UnloadApplet(pAppId.c_str());
+	plugin->JHI_Plugin_UnloadApplet(pAppId.c_str(), GlobalsManager::Instance().getSigVersion());
 
 errorRemoveApplet:
 

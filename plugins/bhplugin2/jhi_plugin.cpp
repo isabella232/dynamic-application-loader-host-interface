@@ -204,7 +204,7 @@ end:
 	}
 #endif
 
-	void BeihaiPlugin::setUninstallPack(const char *pAppId, char** uninstallPkg)
+	void BeihaiPlugin::setUninstallPack(const char *pAppId, int sigVersion, char** uninstallPkg, int* uninstallPkgLen)
 	{
 		if (pAppId == NULL || uninstallPkg == NULL)
 		{
@@ -231,15 +231,25 @@ end:
 		string appId = string(pAppId);
 		std::transform(appId.begin(), appId.end(), appId.begin(), ::toupper);
 
+		char* uninstallPack = UNINSTALL_PACK_SIG_VER_1;
+		*uninstallPkgLen = UNINSTALL_PACK_SIG_VER_1_LEN;
+		int dal_manifest_length = JHI_SIG_VER_1_MANIFEST_LENGTH;
+		if (sigVersion == SIG_VERSION_3K_APPLET_SIGNING)
+		{
+			uninstallPack = UNINSTALL_PACK_SIG_VER_2;
+			*uninstallPkgLen = UNINSTALL_PACK_SIG_VER_2_LEN;
+			dal_manifest_length = JHI_SIG_VER_2_MANIFEST_LENGTH;
+		}
+
 		// copying the uninstall pack
-		*uninstallPkg = (char*)memory_api.allocateMemory(UNINSTALL_PACK_LEN);
+		*uninstallPkg = (char*)memory_api.allocateMemory(*uninstallPkgLen);
 		if (*uninstallPkg == NULL)
 			return;
 
-		memcpy_s(*uninstallPkg, UNINSTALL_PACK_LEN, UNINSTALL_PACK, UNINSTALL_PACK_LEN);
+		memmove_s(*uninstallPkg, *uninstallPkgLen, uninstallPack, *uninstallPkgLen);
 
 		// replacing the uuid
-		char* ptr = *uninstallPkg + 32 + JHI_CSS_HEADER_SIZE;
+		char* ptr = *uninstallPkg + 32 + dal_manifest_length;
 		for(int i=0; i< 32; i+=2)
 		{
 			string byte = appId.substr(i,2);
@@ -310,7 +320,7 @@ end:
 
 		return totalSessionsCount;
 	}
-	void BeihaiPlugin::uninstallAll()
+	void BeihaiPlugin::uninstallAll(int sigVersion)
 	{
 		BH_RET ret;
 #ifndef OPEN_INTEL_SD_SESSION_ONCE
@@ -363,7 +373,7 @@ end:
 					appletSessions = NULL;
 				}
 				// uninstall the TA
-				ret = JHI_Plugin_UnloadApplet(appIdStrs[i]);
+				ret = JHI_Plugin_UnloadApplet(appIdStrs[i], sigVersion);
 				BHP_Free(appIdStrs[i]);
 				appIdStrs[i] = NULL;
 			}
@@ -747,11 +757,24 @@ end:
 		// bhPlugin will allocate memory in metadata and lenght,
 		// which should be freed using bhp_free
 		ret = BHP_QueryTEEMetadata(&bh_metadata, length);
+		
+		if (bh_metadata != NULL && ((dal_tee_metadata*)bh_metadata)->sig_version == 0)
+		{
+			// sig_version 1 means sign once 2K DAL dedicated key.
+			// sig_version 2 means sign once 3K DAL dedicated key.
+			// Some old FW projects did not implemented the sig_version member.
+			// It was added to the FW when 3K applet signing was first enabled,
+			// so if we are working with bh v2 and the sig version we
+			// recieve is 0, that means that this is sign once 2K DAL dedicated key
+			// but the FW implementation of this member was not yet implemented.
+			((dal_tee_metadata*)bh_metadata)->sig_version = SIG_VERSION_2K_APPLET_SIGNING;
+			TRACE0("Got sig version 0 in QueryTeeMetadata, changed sig version to 1.");
+		}
 
 		if (ret == BH_SUCCESS)
 		{
 			*metadata = (unsigned char *)JHI_ALLOC(*length);
-			memcpy_s(*metadata, *length, bh_metadata, *length);
+			memmove_s(*metadata, *length, bh_metadata, *length);
 			BHP_Free(bh_metadata);
 		}
 
@@ -931,7 +954,7 @@ end:
 		return beihaiToJhiError(ret,JHI_INTERNAL_ERROR);
 	}
 
-	UINT32 BeihaiPlugin::JHI_Plugin_UnloadApplet(const char *pAppId)
+	UINT32 BeihaiPlugin::JHI_Plugin_UnloadApplet(const char *pAppId, int sigVersion)
 	{
 		TRACE0("JHI_Plugin_UnloadApplet start");
 #ifndef OPEN_INTEL_SD_SESSION_ONCE
@@ -944,17 +967,18 @@ end:
 #endif
 
 		char* uninstallPkg = NULL;
+		int uninstallPkgLen = 0;
 
 		BH_RET ret;
 
-		setUninstallPack(pAppId, &uninstallPkg);
+		setUninstallPack(pAppId, sigVersion, &uninstallPkg, &uninstallPkgLen);
 		if (uninstallPkg == NULL)
 		{
 			return JHI_INTERNAL_ERROR;
 		}
 
 		TRACE1("uninstalling applet: %s.", pAppId);
-		ret = BHP_SendAdminCmdPkg(intel_sd_handle, (const char*)uninstallPkg, UNINSTALL_PACK_LEN);
+		ret = BHP_SendAdminCmdPkg(intel_sd_handle, (const char*)uninstallPkg, uninstallPkgLen);
 
 #ifndef OPEN_INTEL_SD_SESSION_ONCE
 		//close the SD
@@ -1005,7 +1029,7 @@ end:
 			_itoa_s(versionUINT, *output, 6, 10);
 #else
 			string s_version = to_string(versionUINT);
-			memcpy_s(*output, 6, s_version.c_str(), 6);
+			memmove_s(*output, 6, s_version.c_str(), 6);
 #endif
 			return true;
 		}
@@ -1141,7 +1165,7 @@ cleanup:
 		BH_RET outputLength = 0;
 
 		char Uuid[sizeof(JHI_SESSION_ID)];
-		memcpy_s(Uuid,sizeof(JHI_SESSION_ID),&SessionID,sizeof(JHI_SESSION_ID));
+		memmove_s(Uuid,sizeof(JHI_SESSION_ID),&SessionID,sizeof(JHI_SESSION_ID));
 		// the value '1' in the 'what' field is internally reserved for passing the SessionID
         BH_RET ret = BHP_SendAndRecvInternal( *pSession, 1, 0, Uuid, sizeof(JHI_SESSION_ID), (void**)&pOutput, (unsigned int *)&outputLength, appletResponse);
 		//TRACE1("sendSessionIDtoApplet end, result = 0x%X", ret);
@@ -1317,7 +1341,7 @@ cleanup:
 					return JHI_INTERNAL_ERROR;
 				}
 
-				memcpy_s((*ppEventData)->data,(*ppEventData)->datalen, (UINT8*)IOBuffer.RxBuf->buffer + sizeof(JHI_SESSION_ID),(*ppEventData)->datalen);
+				memmove_s((*ppEventData)->data,(*ppEventData)->datalen, (UINT8*)IOBuffer.RxBuf->buffer + sizeof(JHI_SESSION_ID),(*ppEventData)->datalen);
 			}
 
 			(*ppEventData)->dataType = JHI_DATA_FROM_APPLET;
@@ -1364,7 +1388,7 @@ cleanup:
 			//}
 
 			// copy the output to the output buffer
-			memcpy_s(outputBuffer, *outputBufferLength, output, outputLength);	
+			memmove_s(outputBuffer, *outputBufferLength, output, outputLength);	
 		}
 
 		*outputBufferLength = outputLength;

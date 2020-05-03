@@ -76,34 +76,27 @@ jhis_close_session(
 	if (info.state == JHI_SESSION_STATE_NOT_EXISTS)
 		return JHI_INVALID_SESSION_HANDLE;
 
-	// if processInfo == NULL or there are no more owners, remove the session
-	if (processInfo == NULL)
+	// If processInfo == NULL or the session is non-shared, remove the session
+	// In Non-shared session, do not check the process info, the session handle value is enough to close the session
+	if (processInfo == NULL || ((Sessions.getOwnersCount(*pSessionID) == 1) && (!sessionFlags.bits.sharedSession)))
 	{
 		removeSession = true;
 	}
-	else
+	else //shared session
 	{
-		if (Sessions.isSessionOwnerValid(*pSessionID,processInfo))
+		if (force)// Shared, force
 		{
-			if ((Sessions.getOwnersCount(*pSessionID) == 1) && (!sessionFlags.bits.sharedSession)) // Non-shared
-			{
-				removeSession = true;
-			}
-			else if(!force) // Shared, don't force
-			{
-				Sessions.removeSessionOwner(*pSessionID,processInfo);
-			}
-			else // Shared, force
-			{
-				removeSession = true;
-			}
-			ulRetCode = JHI_SUCCESS;
+			removeSession = true;
 		}
-		else
+		else if (Sessions.isSessionOwnerValid(*pSessionID, processInfo)) // Shared, don't force
 		{
-			// error there is no such session owner.
-			ulRetCode = JHI_INTERNAL_ERROR;
+			Sessions.removeSessionOwner(*pSessionID, processInfo);
 		}
+		else // Session owner is not valid in shared session
+		{
+			return JHI_INTERNAL_ERROR;
+		}
+		ulRetCode = JHI_SUCCESS;
 	}
 
 	if (removeSession)

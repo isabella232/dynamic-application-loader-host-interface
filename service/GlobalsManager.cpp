@@ -236,6 +236,25 @@ namespace intel_dal
 			return CSE;
 	}
 
+	char GlobalsManager::getSigVersion() { return sigVersion; }
+	
+	void GlobalsManager::setSigVersion(char version)
+	{
+		locker.Lock();
+		sigVersion = version;
+		TRACE1("The signature version is: %d", version);
+		locker.UnLock();
+	}
+
+	int GlobalsManager::getApiLevel() { return apiLevel; }
+
+	void GlobalsManager::setApiLevel(int level)
+	{
+		locker.Lock();
+		apiLevel = level;
+		locker.UnLock();
+	}
+	
 	// Reset event
 	void GlobalsManager::sendResetCompleteEvent()
 	{

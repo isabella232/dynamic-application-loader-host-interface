@@ -184,7 +184,7 @@ end:
 		return JhiErrorTranslate(bhRet, JHI_INTERNAL_ERROR);
 	}
 
-	UINT32 BeihaiPlugin::JHI_Plugin_UnloadApplet(const char *AppId)
+	UINT32 BeihaiPlugin::JHI_Plugin_UnloadApplet(const char *AppId, int sigVersion)
 	{
 		BH_ERRNO bhRet = BH_PluginUnload(const_cast<char*>(AppId));
 		return JhiErrorTranslate(bhRet, JHI_INTERNAL_ERROR);
@@ -345,7 +345,7 @@ cleanup:
 		int outputLength = 0;
 		char Uuid[sizeof(JHI_SESSION_ID)];
 
-		memcpy_s(Uuid,sizeof(JHI_SESSION_ID),&SessionID,sizeof(JHI_SESSION_ID));
+		memmove_s(Uuid,sizeof(JHI_SESSION_ID),&SessionID,sizeof(JHI_SESSION_ID));
 		// the value '1' in the 'what' field is internally reserved for passing the SessionID
 		BH_ERRNO bhRet = BH_PluginSendAndRecvInternal( *pSession, 1, 0, Uuid, sizeof(JHI_SESSION_ID), (void**)&pOutput, (unsigned int *)&outputLength, appletResponse);
 
@@ -459,7 +459,7 @@ cleanup:
 					return JHI_INTERNAL_ERROR;
 				}
 
-				memcpy_s((*ppEventData)->data,(*ppEventData)->datalen, (UINT8*)IOBuffer.RxBuf->buffer + sizeof(JHI_SESSION_ID),(*ppEventData)->datalen);
+				memmove_s((*ppEventData)->data,(*ppEventData)->datalen, (UINT8*)IOBuffer.RxBuf->buffer + sizeof(JHI_SESSION_ID),(*ppEventData)->datalen);
 			}
 
 			(*ppEventData)->dataType = JHI_DATA_FROM_APPLET;
@@ -503,7 +503,7 @@ cleanup:
 			//}
 
 			// copy the output to the output buffer
-			memcpy_s(outputBuffer, *outputBufferLength, output,outputLength);
+			memmove_s(outputBuffer, *outputBufferLength, output,outputLength);
 		}
 
 		*outputBufferLength = outputLength;

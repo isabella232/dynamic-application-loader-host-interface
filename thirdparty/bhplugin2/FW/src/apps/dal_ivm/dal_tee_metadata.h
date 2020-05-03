@@ -29,7 +29,7 @@ writing.
 #define DAL_MAX_PLATFORM_TYPE_LEN       (8)
 #define DAL_MAX_VM_TYPE_LEN             (16)
 #define DAL_MAX_VM_VERSION_LEN          (12)
-#define DAL_RESERVED_DWORDS             (16)
+#define DAL_RESERVED_BYTES             (63)
 
 #define DAL_PRODUCTION_KEY_HASH_LEN     (32)
 
@@ -74,21 +74,20 @@ typedef union _dal_feature_set_values
     struct
     {
         uint32_t  cryptography    : 1;
-        uint32_t  utils           : 1;
-        uint32_t  secure_time     : 1;
-        uint32_t  debug           : 1;
+        uint32_t  sigma           : 1;
         uint32_t  storage         : 1;
-        uint32_t  key_exchange    : 1;
-        uint32_t  trusted_output  : 1;
+        uint32_t  utils           : 1;
         uint32_t  SSL             : 1;
-        uint32_t  sensors         : 1;
+        uint32_t  trusted_output  : 1;
+        uint32_t  trusted_input   : 1;
         uint32_t  NFC             : 1;
-        uint32_t  IAC             : 1;
         uint32_t  platform        : 1;
-        uint32_t  secure_enclave  : 1;
+        uint32_t  debug           : 1;
+        uint32_t  sensors         : 1; // not supported
+        uint32_t  IAC             : 1;
         uint32_t  AMT             : 1;
-        uint32_t  VTEE            : 1;
-        uint32_t  reserved        : 17;
+
+        uint32_t  reserved        : 19;
     };
 
 } dal_feature_set_values;
@@ -117,7 +116,8 @@ typedef struct _dal_tee_metadata
     uint64_t    access_control_groups; // a bitmask of the access control groups defined in the Java Class Library on this platform,
                                        // unsigned integer bitmask values in dal_access_control_groups
     dal_fw_version fw_version; // the version of the firmware image on this platform
-    uint32_t    reserved[DAL_RESERVED_DWORDS]; // reserved DWORDS for future use
+	uint8_t         sig_version; // the applets signature version: 1 - sign once 2K key. 2 - sign once 3K key.
+    uint8_t         reserved[DAL_RESERVED_BYTES]; // reserved bytes for future use
 
 } dal_tee_metadata;
 

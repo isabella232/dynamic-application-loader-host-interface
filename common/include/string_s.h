@@ -71,6 +71,20 @@ static inline errno_t memcpy_s(void *dest, size_t dest_cnt, const void *src, siz
 	memcpy(dest, src, n);
 	return 0;
 }
+
+static inline errno_t memmove_s(void *dest, size_t destMax, const void *src, size_t count)
+{
+	if (!dest || !src) {
+		return EINVAL;
+	}
+	if (destMax < count) {
+		return ERANGE;
+	}
+
+	memmove(dest, src, count);
+	return 0;
+}
+
 static inline errno_t strcpy_s(char *dest, size_t n, const char *src)
 {
 	if (dest == NULL || src == NULL)

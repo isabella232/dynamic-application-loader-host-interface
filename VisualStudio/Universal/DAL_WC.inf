@@ -1,6 +1,6 @@
 ;=============================================================================
 ;
-; Copyright (c) Intel Corporation (2017).
+; Copyright (c) Intel Corporation (2017-2019).
 ;
 ; INTEL MAKES NO WARRANTY OF ANY KIND REGARDING THE CODE.  THIS CODE IS
 ; LICENSED ON AN "AS IS" BASIS AND INTEL WILL NOT PROVIDE ANY SUPPORT,
@@ -26,6 +26,7 @@ ClassGuid={5c4c3332-344d-483c-8739-259e934c9cc8}
 Provider=%ManufacturerName%
 CatalogFile=DAL_WC.cat
 DriverVer=03/20/2017,9999.99.0.0
+PnpLockDown=1
 
 [SourceDisksNames]
 1 = %DiskId%
@@ -61,6 +62,14 @@ AddService = jhi_service, %SPSVCSINST_STARTSERVICE%, DAL_Service_Inst
 [DALInstallSection.ntamd64.Interfaces]
 AddInterface="{DBA4D603-D7ED-4931-8823-17AD585705D5}", , DALInterfaceSection
 
+; For event logs translation
+[DALInstallSection.ntamd64.Events]
+AddEventProvider={EB9BA5A7-5E8F-4126-9A9A-E4BECBAC10F0},DalEventLog_prov_inst
+
+[DalEventLog_prov_inst]
+ProviderName=IntelDalJhi
+ResourceFile=%13%\jhi_service.exe
+
 [DALInterfaceSection]
 AddReg=DALInterfaceSection_AddReg
 
@@ -89,9 +98,6 @@ HKR, Parameters, "APPLETSLOCALE", %FLG_ADDREG_TYPE_EXPAND_SZ%, %%LOCALAPPDATA%%\
 ; Disabled temporarily to work around a RS4 bug where the 'Security' definition above wasn't supported.
 ;HKR, Parameters, "DelayedAutostart", %FLG_ADDREG_TYPE_DWORD%, 1
 
-; For event logs translation
-HKLM, "SYSTEM\CurrentControlSet\Services\eventlog\Application\IntelDalJhi", "EventMessageFile", %FLG_ADDREG_TYPE_EXPAND_SZ%, %%SystemRoot%%\System32\jhi_service.exe
-HKLM, "SYSTEM\CurrentControlSet\Services\eventlog\Application\IntelDalJhi", "TypesSupported", %FLG_ADDREG_TYPE_DWORD%, 7
 
 ; --------- Files ----------------------
 [DAL.Files.13]
@@ -103,12 +109,12 @@ JHI64.dll
 TEEManagement64.dll
 
 [Strings]
-SPSVCINST_ASSOCSERVICE= 0x00000002
-SPSVCSINST_STARTSERVICE= 0x00000800
+SPSVCINST_ASSOCSERVICE=0x00000002
+SPSVCSINST_STARTSERVICE=0x00000800
 FLG_ADDREG_TYPE_DWORD=0x00010001
 FLG_ADDREG_TYPE_EXPAND_SZ=0x00020000 
 FLG_ADDREG_TYPE_SZ=0x00000000 
 
 DALDescription="Intel(R) Dynamic Application Loader Host Interface"
-DiskId = "Intel(R) Dynamic Application Loader Host Interface Installation Disk"
+DiskId="Intel(R) Dynamic Application Loader Host Interface Installation Disk"
 ManufacturerName="Intel"

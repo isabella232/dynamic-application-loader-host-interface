@@ -95,7 +95,7 @@ jhis_create_session(
 			ulRetCode = Applets.getAppletBlobs(filename, appletBlobs, isAcp);
 			if (ulRetCode != JHI_SUCCESS)
 			{
-				TRACE0("failed getting applet blobs from dalp file\n");
+				TRACE0("jhis_create_session: Failed to get applet blobs from dalp file.\n");
 				break;
 			}
 			// If ulRetCode == JHI_SUCCESS appletBlobs will not be empty and VMSessionHandle will always be initialized

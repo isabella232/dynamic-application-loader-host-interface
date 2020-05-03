@@ -26,6 +26,7 @@ ClassGuid={5c4c3332-344d-483c-8739-259e934c9cc8}
 Provider=%ManufacturerName%
 CatalogFile=DAL.cat
 DriverVer=03/20/2017,9999.99.0.0
+PnpLockDown=1
 
 [SourceDisksNames]
 1 = %DiskId%
@@ -60,10 +61,20 @@ CopyFiles = DAL_Files.amd64
 
 [DALInstallSection.ntamd64.Services]
 AddService = , 0x00000002
-AddService = jhi_service, %SPSVCSINST_STARTSERVICE%, DAL_Service_Inst
+AddService = jhi_service, %SPSVCSINST_STARTSERVICE%, DAL_Service_Inst, DalEventLog_prov_inst, Application
 
 [DALInstallSection.ntamd64.Interfaces]
 AddInterface="{3C4852D6-D47B-4F46-B05E-B5EDC1AA440E}", , DALInterfaceSection
+
+; For event logs translation
+[DALInstallSection.ntamd64.Events]
+AddEventProvider={EB9BA5A7-5E8F-4126-9A9A-E4BECBAC10F0},DalEventLog_prov_inst
+
+[DalEventLog_prov_inst]
+ProviderName=IntelDalJhi
+ResourceFile=%13%\jhi_service.exe
+MessageFile=%13%\jhi_service.exe
+Enabled=1
 
 [DALInterfaceSection]
 AddReg=DALInterfaceSection_AddReg
@@ -92,10 +103,6 @@ HKR, Parameters, "APPLETSLOCALE", %FLG_ADDREG_TYPE_EXPAND_SZ%, %%LOCALAPPDATA%%\
 ; Delayed start
 ; Disabled temporarily to work around a RS4 bug where the 'Security' definition above wasn't supported.
 ;HKR, Parameters, "DelayedAutostart", %FLG_ADDREG_TYPE_DWORD%, 1
-
-; For event logs translation
-HKLM, "SYSTEM\CurrentControlSet\Services\eventlog\Application\IntelDalJhi", "EventMessageFile", %FLG_ADDREG_TYPE_EXPAND_SZ%, %%SystemRoot%%\System32\jhi_service.exe
-HKLM, "SYSTEM\CurrentControlSet\Services\eventlog\Application\IntelDalJhi", "TypesSupported", %FLG_ADDREG_TYPE_DWORD%, 7
 
 ; --------- Files ----------------------
 [DAL.Files.13]

@@ -46,7 +46,8 @@
 #ifdef SCHANNEL_OVER_SOCKET // emulation mode
 #define REGISTRY_PATH  "SYSTEM\\CurrentControlSet\\Services\\jhi_service_emulation"
 #else
-#define REGISTRY_PATH  "SYSTEM\\CurrentControlSet\\Services\\jhi_service"
+#define REGISTRY_PATH			"SYSTEM\\CurrentControlSet\\Services\\jhi_service"
+#define REGISTRY_PARAMS_PATH	"SYSTEM\\CurrentControlSet\\Services\\jhi_service\\Parameters"
 #endif
 
 #else // old reg location
@@ -94,7 +95,6 @@ bool readStringFromRegistry(const wchar_t* value, wchar_t* outBuffer, uint32_t o
 		return false;
 	}
 	
-	//TRACE1("Registry read success for %S\n",key);
 	return true;
 }
 
@@ -127,29 +127,71 @@ bool readIntegerFromRegistry(const wchar_t* key,uint32_t* value)
 		return false;
 	}
 
-	//TRACE1("Registry read integer key '%S' success\n",key);
 	RegCloseKey(hKey);
 	return true;
 }
 
 #ifdef NEW_REG_LOCATION
+/*
+	In windows RS3, the function GetServiceRegistryStateKey is not yet implemented in sechost.dll.
+	In order to run JHI on windows RS3 as well, we dynamically load the dll and see if we can use this function,
+	if not - this is windows RS3 and we read from a known path in registry.
+*/
+bool openServiceParametersRegistryKey(HKEY* hKey, SERVICE_STATUS_HANDLE srvcHandle)
+{
+	typedef DWORD (WINAPI *DLLFN) (SERVICE_STATUS_HANDLE, SERVICE_REGISTRY_STATE_TYPE, DWORD, HKEY*);
+
+	LSTATUS status;
+	HMODULE hDll;
+	DLLFN fnPtrGetRegKey;
+
+	if ((hDll = LoadLibraryEx(L"sechost.dll", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32)) == NULL)
+	{
+		TRACE1("LoadLibraryEx with sechost.dll failed. Error: [0x%x]", GetLastError());
+		return false;
+	}
+
+	if ((fnPtrGetRegKey = (DLLFN) GetProcAddress(hDll, "GetServiceRegistryStateKey")) != NULL) // If the dll contains this function - get path from windows.
+	{
+		if ((status = fnPtrGetRegKey(srvcHandle, ServiceRegistryStateParameters, KEY_READ, hKey)) != ERROR_SUCCESS)
+		{
+			TRACE2("GetServiceRegistryStateKey failed [0x%x] handle %p", status, (void *)srvcHandle);
+			FreeLibrary(hDll);
+			return false;
+		}
+	}
+	else // If not - read from known registry location.
+	{
+		TRACE0("GetProcAddress with GetServiceRegistryStateKey failed, This is windows RS3 or lower.");
+		if ((status = RegOpenKeyEx(REGISTRY_BASE, TEXT(REGISTRY_PARAMS_PATH), 0, KEY_READ | KEY_WOW64_64KEY, hKey)) != ERROR_SUCCESS)
+		{
+			TRACE2("Registry read failure for %s, RegOpenKeyEx failed [0x%x]\n", REGISTRY_PARAMS_PATH, status);
+			FreeLibrary(hDll);
+			return false;
+		}
+	}
+
+	FreeLibrary(hDll);
+	return true;
+}
+
+
 bool readStringParameterFromRegistry(SERVICE_STATUS_HANDLE srvcHandle, const wchar_t* value, wchar_t* outBuffer, uint32_t outBufferSize)
 {
 	HKEY hKey;
 	DWORD dwType = REG_SZ | REG_EXPAND_SZ;
 	int maxElementSize = -1;
-	int ret;
+	LSTATUS status;
 
-	if ((ret = GetServiceRegistryStateKey(srvcHandle, ServiceRegistryStateParameters, KEY_READ, &hKey)) != ERROR_SUCCESS)
+	if (!openServiceParametersRegistryKey(&hKey, srvcHandle))
 	{
-		TRACE3("Registry read failure for %S, GetServiceRegistryStateKey failed %d handle %p\n", value, ret, (void *)srvcHandle);
 		return false;
 	}
 
 	// Check for the actual value
-	if (RegQueryValueEx(hKey, value, 0, &dwType, (LPBYTE)outBuffer, (LPDWORD)&outBufferSize) != ERROR_SUCCESS)
+	if ((status = RegQueryValueEx(hKey, value, 0, &dwType, (LPBYTE)outBuffer, (LPDWORD)&outBufferSize)) != ERROR_SUCCESS)
 	{
-		TRACE1("Registry read failure for %S\n", value);
+		TRACE2("Registry read failure for %S. Error: [0x%x]\n", value, status);
 		RegCloseKey(hKey);
 		return false;
 	}

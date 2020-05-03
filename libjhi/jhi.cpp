@@ -1046,7 +1046,7 @@ JHI_GetAppletProperty(
 		goto cleanup;
 	}
 	ZeroMemory(TxBuf.buffer, TxBuf.length + 1);
-	memcpy_s(TxBuf.buffer, pComm->TxBuf->length , ConvertWStringToString((FILECHAR*)pComm->TxBuf->buffer).c_str(), TxBuf.length);
+	memmove_s(TxBuf.buffer, pComm->TxBuf->length , ConvertWStringToString((FILECHAR*)pComm->TxBuf->buffer).c_str(), TxBuf.length);
 	
 	RxBuf.length = pComm->RxBuf->length;
 	if (0 != RxBuf.length)

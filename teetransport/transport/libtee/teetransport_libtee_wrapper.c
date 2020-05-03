@@ -351,7 +351,7 @@ TEE_COMM_STATUS TEELIB_Recv(IN TEE_TRANSPORT_INTERFACE_PTR pInterface, IN TEE_TR
     if(pClient->capacity >= (*length))
     {
         const char* ptr = (const char*)pClient->buffer;
-        memcpy_s(buffer, (*length), &(ptr[pClient->curr_pos]), (*length));
+        memmove_s(buffer, (*length), &(ptr[pClient->curr_pos]), (*length));
         pClient->capacity -= (*length);
         pClient->curr_pos += (*length);
     }
@@ -359,7 +359,7 @@ TEE_COMM_STATUS TEELIB_Recv(IN TEE_TRANSPORT_INTERFACE_PTR pInterface, IN TEE_TR
     else
     {
         const char* ptr = (const char*)pClient->buffer;
-        memcpy_s(buffer, (*length), &(ptr[pClient->curr_pos]), pClient->capacity);
+        memmove_s(buffer, (*length), &(ptr[pClient->curr_pos]), pClient->capacity);
         (*length) = (uint32_t)pClient->capacity;
 		pClient->capacity = 0;
     }

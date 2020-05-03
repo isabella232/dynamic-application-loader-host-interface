@@ -69,8 +69,14 @@ namespace intel_dal
 		VM_Plugin_interface* plugin_table;	// contains the functions for communication with the VM
 
 		TEE_TRANSPORT_TYPE transportType;	// the transport type to communicate with DAL (HECI / sockets)
-		JHI_VM_TYPE vmType;				// the discovered DAL VM type in the FW
+		JHI_VM_TYPE vmType;					// the discovered DAL VM type in the FW
 		VERSION fwVersion;
+		char sigVersion;				// The applets signature version:
+										// 0 - before CSE, signing is one for eache project.
+										// 1 - CSE sign once 2K signature
+										// 2 - CSE sign once 3K signature
+
+		int apiLevel; 					// The FW API level
 
 #ifdef _WIN32
 		HANDLE resetCompleteEvent;
@@ -219,6 +225,14 @@ namespace intel_dal
 
 		JHI_PLATFROM_ID getPlatformId();
 
+		char getSigVersion();
+		
+		void setSigVersion(char version);
+
+		int getApiLevel();
+
+		void setApiLevel(int level);
+		
 		/*
 			Notify that JHI reset has completed by sending an event
 		*/

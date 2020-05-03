@@ -563,7 +563,7 @@ namespace intel_dal
 						break;
 					}
 
-					memcpy_s(pEventData->data,pEventDataFromQ->datalen,pEventDataFromQ->data,pEventDataFromQ->datalen);
+					memmove_s(pEventData->data,pEventDataFromQ->datalen,pEventDataFromQ->data,pEventDataFromQ->datalen);
 					JHI_DEALLOC(pEventDataFromQ->data);
 					pEventDataFromQ->data = NULL;
 				}
@@ -963,7 +963,7 @@ end:
 
 	bool SessionsManager::isSessionOwnerValid(JHI_SESSION_ID sessionID, JHI_PROCESS_INFO* info)
 	{
-		bool removed = false;
+		bool valid = false;
 		list<JHI_PROCESS_INFO>::iterator owner_it;
 
 		_locker.Lock();
@@ -979,7 +979,7 @@ end:
 					owner_it->creationTime.dwHighDateTime == info->creationTime.dwHighDateTime &&
 					owner_it->creationTime.dwLowDateTime == info->creationTime.dwLowDateTime)
 				{
-					removed = true;
+					valid = true;
 					break;
 				}
 			}
@@ -988,7 +988,7 @@ end:
 
 		_locker.UnLock();
 
-		return removed;
+		return valid;
 	}
 
 	int SessionsManager::getOwnersCount(JHI_SESSION_ID sessionID)

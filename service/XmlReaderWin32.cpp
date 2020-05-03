@@ -111,7 +111,7 @@ namespace intel_dal
 				return false;
 			}
 
-			memcpy_s(*value,size,node->nodeTypedValue.parray->pvData,size);
+			memmove_s(*value,size,node->nodeTypedValue.parray->pvData,size);
 			//value = (char*) node->nodeTypedValue.parray->pvData;
 
 			*blobSize = size;

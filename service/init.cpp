@@ -295,49 +295,48 @@ JHI_VM_TYPE discoverVmType(TEE_TRANSPORT_TYPE transportType)
 	return vmType;
 }
 
-VERSION discoverFwVersion(VM_Plugin_interface & plugin)
+// Get the FW version, the API level and the signature version (applet signature version - 2K signature or 3K signature)
+bool getFwProperties(VM_Plugin_interface & plugin, VERSION* fwVersion, char* sigVersion, int* apiLevel)
 {
-	VERSION fwVersion = {0};
-	dal_tee_metadata metadata = {0};
+	dal_tee_metadata metadata = { 0 };
 	unsigned char * c_metadata = nullptr;
 	unsigned int length = 0;
 
 	plugin.JHI_Plugin_QueryTeeMetadata(&c_metadata, &length);
-	
-	if (c_metadata == nullptr)
-		return fwVersion;
 
-	if(length != sizeof(dal_tee_metadata))
+	if (c_metadata == nullptr)
+		return false;
+
+	if (length != sizeof(dal_tee_metadata))
 	{
 		LOG2("Unexpected metadata size. Expected: %d. Got: %d", sizeof(dal_tee_metadata), length);
 		JHI_DEALLOC(c_metadata);
-		return fwVersion;
+		return false;
 	}
 
-	memcpy_s(&metadata, sizeof(metadata), c_metadata, length);
+	memmove_s(&metadata, sizeof(metadata), c_metadata, length);
 	JHI_DEALLOC(c_metadata);
 
-	fwVersion.Major = metadata.fw_version.major;
-	fwVersion.Minor = metadata.fw_version.minor;
-	fwVersion.Hotfix= metadata.fw_version.hotfix;
-	fwVersion.Build = metadata.fw_version.build;
+	fwVersion->Major = metadata.fw_version.major;
+	fwVersion->Minor = metadata.fw_version.minor;
+	fwVersion->Hotfix = metadata.fw_version.hotfix;
+	fwVersion->Build = metadata.fw_version.build;
 
-	TRACE4("Successfully retrieved FW version from FW: %d.%d.%d.%d", fwVersion.Major, fwVersion.Minor, fwVersion.Hotfix, fwVersion.Build);
+	*sigVersion = metadata.sig_version;
+	*apiLevel = metadata.api_level;
 
-	return fwVersion;
-};
+	return true;
+}
 
-VERSION discoverFwVersionLegacy()
+bool discoverFwVersionLegacy(VERSION* fwVersion)
 {
-	VERSION fwVersion = {0};
-
 	IFirmwareInfo* fwInfo = FWInfoFactory::createInstance();
 	bool versionReceived = false;
 
 	if (fwInfo == NULL)
 	{
 		TRACE0("Failed to create IFirmwareInfo instance\n");
-		return fwVersion;
+		return false;
 	}
 	else
 	{
@@ -349,7 +348,7 @@ VERSION discoverFwVersionLegacy()
 				continue;
 			}
 
-			if( fwInfo->GetFwVersion(&fwVersion) && (fwVersion.Major != 0) )
+			if( fwInfo->GetFwVersion(fwVersion) && (fwVersion->Major != 0) )
 				versionReceived = true;
 			else
 				TRACE1("Failed to get FW Version, attempt number %d\n", triesCount);
@@ -367,9 +366,9 @@ VERSION discoverFwVersionLegacy()
 	if (!versionReceived) //failed getting the fw version
 		TRACE0("Failed getting FW version from FW");
 	else
-		TRACE4("FW Version:\nMajor: %d\nMinor: %d\nHotfix: %d\nBuild: %d", fwVersion.Major, fwVersion.Minor, fwVersion.Hotfix, fwVersion.Build);
+		TRACE4("FW Version:\nMajor: %d\nMinor: %d\nHotfix: %d\nBuild: %d", fwVersion->Major, fwVersion->Minor, fwVersion->Hotfix, fwVersion->Build);
 
-	return fwVersion;
+	return true;
 }
 
 bool pluginRegister(JHI_VM_TYPE vmType, VM_Plugin_interface** plugin_table)
@@ -524,17 +523,24 @@ JHI_RET_I jhis_init()
 	// Get the FW version using QueryTeeMetadata or MKHI
 	if(GlobalsManager::Instance().getFwVersion().Major == 0) // Not set
 	{
-		VERSION fwVersion;
+		VERSION fwVersion = { 0 };
+		char sigVersion = 0;
+		bool res = false;
+		int apiLevel = -1;
 
 		if(GlobalsManager::Instance().getVmType() == JHI_VM_TYPE_BEIHAI_V2)
-			fwVersion = discoverFwVersion(*plugin);
+			res = getFwProperties(*plugin, &fwVersion, &sigVersion, &apiLevel);
 		else
-			fwVersion = discoverFwVersionLegacy();
+			res = discoverFwVersionLegacy(&fwVersion);
 
-		if(fwVersion.Major == 0)
-			LOG0("Failed getting FW version from FW or got 0 as major version.");
+		if (!res)
+			LOG0("Failed to get FW properties from FW.");
+		if (fwVersion.Major == 0)
+			LOG0("Got 0 as major version.");
 
 		GlobalsManager::Instance().setFwVersion(fwVersion);
+		GlobalsManager::Instance().setSigVersion(sigVersion);
+		GlobalsManager::Instance().setApiLevel(apiLevel);
 	}
 
 	// Initialize the EventManager (Spooler applet)

@@ -266,7 +266,7 @@
       <PreprocessorDefinitions>WINDOWS_7_SUPPORT;TRACER_NAME="JHI_Lib: ";WIN32;DEBUG;_DEBUG;_WINDOWS;_USRDLL;JHI_EXPORTS;CS_SOCKETS_COMMUNICATION;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
@@ -325,7 +325,7 @@
       <PreprocessorDefinitions>WINDOWS_7_SUPPORT;TRACER_NAME="JHI_Lib: ";WIN32;DEBUG;_DEBUG;_WINDOWS;_USRDLL;JHI_EXPORTS;CS_SOCKETS_COMMUNICATION;WIN32_LEAN_AND_MEAN;SCHANNEL_OVER_SOCKET;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
@@ -355,7 +355,7 @@
       <PreprocessorDefinitions>WINDOWS_7_SUPPORT;TRACER_NAME="JHI_Lib: ";WIN32;_DEBUG;_WINDOWS;_USRDLL;JHI_EXPORTS;CS_SOCKETS_COMMUNICATION;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions);WIN64</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
@@ -416,7 +416,7 @@
       <PreprocessorDefinitions>WINDOWS_7_SUPPORT;TRACER_NAME="JHI_Lib: ";WIN32;_DEBUG;_WINDOWS;_USRDLL;JHI_EXPORTS;CS_SOCKETS_COMMUNICATION;WIN32_LEAN_AND_MEAN;SCHANNEL_OVER_SOCKET;%(PreprocessorDefinitions);WIN64</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
@@ -442,7 +442,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>$(SolutionDir)..\thirdparty\bhplugin2\include;$(SolutionDir)..\thirdparty\bhplugin2\FW\src\apps\dal_ivm;$(SolutionDir)..\common\include;$(SolutionDir)..\ThirdPartySoftware\bhPluginV2\FW\src\apps\dal_ivm;$(SolutionDir)\..\ThirdPartySoftware\bhPluginV2\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WINDOWS_7_SUPPORT;TRACER_NAME="JHI_Lib: ";WIN32;NDEBUG;_WINDOWS;_USRDLL;JHI_EXPORTS;CS_SOCKETS_COMMUNICATION;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader>
       </PrecompiledHeader>
@@ -503,7 +503,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>$(SolutionDir)..\thirdparty\bhplugin2\include;$(SolutionDir)..\thirdparty\bhplugin2\FW\src\apps\dal_ivm;$(SolutionDir)..\common\include;$(SolutionDir)..\ThirdPartySoftware\bhPluginV2\FW\src\apps\dal_ivm;$(SolutionDir)\..\ThirdPartySoftware\bhPluginV2\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WINDOWS_7_SUPPORT;TRACER_NAME="JHI_Lib: ";WIN32;NDEBUG;_WINDOWS;_USRDLL;JHI_EXPORTS;CS_SOCKETS_COMMUNICATION;WIN32_LEAN_AND_MEAN;SCHANNEL_OVER_SOCKET;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader>
       </PrecompiledHeader>
@@ -537,7 +537,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>$(SolutionDir)..\thirdparty\bhplugin2\include;$(SolutionDir)..\thirdparty\bhplugin2\FW\src\apps\dal_ivm;$(SolutionDir)..\common\include;$(SolutionDir)\teeclient\tools\tee_client_api\include;$(SolutionDir)teeclient\common\include;$(SolutionDir)..\ThirdPartySoftware\bhPluginV2\FW\src\apps\dal_ivm;$(SolutionDir)\..\ThirdPartySoftware\bhPluginV2\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WINDOWS_7_SUPPORT;TRACER_NAME="JHI_Lib: ";WIN32;NDEBUG;_WINDOWS;_USRDLL;JHI_EXPORTS;CS_SOCKETS_COMMUNICATION;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions);WIN64</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader>
       </PrecompiledHeader>
@@ -604,7 +604,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>$(SolutionDir)..\thirdparty\bhplugin2\include;$(SolutionDir)..\thirdparty\bhplugin2\FW\src\apps\dal_ivm;$(SolutionDir)..\common\include;$(SolutionDir)\teeclient\tools\tee_client_api\include;$(SolutionDir)teeclient\common\include;$(SolutionDir)..\ThirdPartySoftware\bhPluginV2\FW\src\apps\dal_ivm;$(SolutionDir)\..\ThirdPartySoftware\bhPluginV2\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WINDOWS_7_SUPPORT;TRACER_NAME="JHI_Lib: ";WIN32;NDEBUG;_WINDOWS;_USRDLL;JHI_EXPORTS;CS_SOCKETS_COMMUNICATION;WIN32_LEAN_AND_MEAN;SCHANNEL_OVER_SOCKET;%(PreprocessorDefinitions);WIN64</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader>
       </PrecompiledHeader>

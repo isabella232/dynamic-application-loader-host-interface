@@ -33,7 +33,7 @@
 
 #define BREAKIF(ret)  {if (ret != BH_SUCCESS) break;}
 
-static BH_RET ACP_load_pack(const char *raw_pack,  unsigned size, int cmd_id, ACPack *pack)
+static BH_RET ACP_load_pack(const char *raw_pack,  unsigned size, int sig_ver, int cmd_id, ACPack *pack)
 {
     BH_RET ret = BHE_FAILED;
     PackReader pr = {0};
@@ -50,7 +50,7 @@ static BH_RET ACP_load_pack(const char *raw_pack,  unsigned size, int cmd_id, AC
 
     switch(cmd_id) {
     case AC_INSTALL_SD:
-        ret = ACP_load_ins_sd(&pr, &(((ACInsSDPackExt*)pack)->cmd_pack));
+        ret = ACP_load_ins_sd(&pr, sig_ver, &(((ACInsSDPackExt*)pack)->cmd_pack));
         BREAKIF(ret);
         break;
     case AC_UNINSTALL_SD:
@@ -58,12 +58,12 @@ static BH_RET ACP_load_pack(const char *raw_pack,  unsigned size, int cmd_id, AC
         BREAKIF(ret);
         break;
     case AC_INSTALL_JTA:
-        ret = ACP_load_ins_jta(&pr, &(((ACInsJTAPackExt*)pack)->cmd_pack));
+        ret = ACP_load_ins_jta(&pr, sig_ver, &(((ACInsJTAPackExt*)pack)->cmd_pack));
         BREAKIF(ret);
         ret = ACP_load_ta_pack(&pr, &(((ACInsJTAPackExt*)pack)->ta_pack));
         break;
     case AC_INSTALL_NTA:
-        ret = ACP_load_ins_nta(&pr, &(((ACInsNTAPackExt*)pack)->cmd_pack));
+        ret = ACP_load_ins_nta(&pr, sig_ver, &(((ACInsNTAPackExt*)pack)->cmd_pack));
         BREAKIF(ret);
         ret = ACP_load_ta_pack(&pr, &(((ACInsNTAPackExt*)pack)->ta_pack));
         break;
@@ -93,65 +93,79 @@ static BH_RET ACP_load_pack(const char *raw_pack,  unsigned size, int cmd_id, AC
 
 BH_RET ACP_pload_ins_sd(const void *raw_data, unsigned size, ACInsSDPackExt *pack)
 {
-    if (NULL == raw_data || size <= BH_ACP_CSS_HEADER_LENGTH || NULL == pack)
+	int sig_ver = ACP_get_sig_version(raw_data, size);
+
+    if (sig_ver == 0 || NULL == raw_data || size <= ACP_get_css_hdr_len(sig_ver) || NULL == pack)
         return BHE_BAD_PARAMETER;
-    return ACP_load_pack((char*)raw_data + BH_ACP_CSS_HEADER_LENGTH,
-                         size - BH_ACP_CSS_HEADER_LENGTH, AC_INSTALL_SD, (ACPack*)pack);
+    return ACP_load_pack((char*)raw_data + ACP_get_css_hdr_len(sig_ver),
+                         size - ACP_get_css_hdr_len(sig_ver), sig_ver, AC_INSTALL_SD, (ACPack*)pack);
 }
 
 BH_RET ACP_pload_uns_sd(const void *raw_data, unsigned size, ACUnsSDPackExt *pack)
 {
-    if (NULL == raw_data || size <= BH_ACP_CSS_HEADER_LENGTH || NULL == pack)
-        return BHE_BAD_PARAMETER;
-    return ACP_load_pack((char*)raw_data + BH_ACP_CSS_HEADER_LENGTH,
-                         size - BH_ACP_CSS_HEADER_LENGTH, AC_UNINSTALL_SD, (ACPack*)pack);
+	int sig_ver = ACP_get_sig_version(raw_data, size);
+
+	if (sig_ver == 0 || NULL == raw_data || size <= ACP_get_css_hdr_len(sig_ver) || NULL == pack)
+		return BHE_BAD_PARAMETER;
+	return ACP_load_pack((char*)raw_data + ACP_get_css_hdr_len(sig_ver),
+		size - ACP_get_css_hdr_len(sig_ver), sig_ver, AC_UNINSTALL_SD, (ACPack*)pack);
 }
 
 BH_RET ACP_pload_ins_jta(const void *raw_data, unsigned size, ACInsJTAPackExt *pack)
 {
-    if (NULL == raw_data || size <= BH_ACP_CSS_HEADER_LENGTH || NULL == pack)
-        return BHE_BAD_PARAMETER;
-    return ACP_load_pack((char*)raw_data + BH_ACP_CSS_HEADER_LENGTH,
-                         size - BH_ACP_CSS_HEADER_LENGTH, AC_INSTALL_JTA, (ACPack*)pack);
+	int sig_ver = ACP_get_sig_version(raw_data, size);
+
+	if (sig_ver == 0 || NULL == raw_data || size <= ACP_get_css_hdr_len(sig_ver) || NULL == pack)
+		return BHE_BAD_PARAMETER;
+	return ACP_load_pack((char*)raw_data + ACP_get_css_hdr_len(sig_ver),
+		size - ACP_get_css_hdr_len(sig_ver), sig_ver, AC_INSTALL_JTA, (ACPack*)pack);
 }
 
 BH_RET ACP_pload_ins_nta(const void *raw_data, unsigned size, ACInsNTAPackExt *pack)
 {
-    if (NULL == raw_data || size <= BH_ACP_CSS_HEADER_LENGTH || NULL == pack)
-        return BHE_BAD_PARAMETER;
-    return ACP_load_pack((char*)raw_data + BH_ACP_CSS_HEADER_LENGTH,
-                         size - BH_ACP_CSS_HEADER_LENGTH, AC_INSTALL_NTA, (ACPack*)pack);
+	int sig_ver = ACP_get_sig_version(raw_data, size);
+
+	if (sig_ver == 0 || NULL == raw_data || size <= ACP_get_css_hdr_len(sig_ver) || NULL == pack)
+		return BHE_BAD_PARAMETER;
+	return ACP_load_pack((char*)raw_data + ACP_get_css_hdr_len(sig_ver),
+		size - ACP_get_css_hdr_len(sig_ver), sig_ver, AC_INSTALL_NTA, (ACPack*)pack);
 }
 
 BH_RET ACP_pload_uns_jta(const void *raw_data, unsigned size, ACUnsTAPackExt *pack)
 {
-    if (NULL == raw_data || size <= BH_ACP_CSS_HEADER_LENGTH || NULL == pack)
-        return BHE_BAD_PARAMETER;
-    return ACP_load_pack((char*)raw_data + BH_ACP_CSS_HEADER_LENGTH,
-                         size - BH_ACP_CSS_HEADER_LENGTH, AC_UNINSTALL_JTA, (ACPack*)pack);
+	int sig_ver = ACP_get_sig_version(raw_data, size);
+
+	if (sig_ver == 0 || NULL == raw_data || size <= ACP_get_css_hdr_len(sig_ver) || NULL == pack)
+		return BHE_BAD_PARAMETER;
+	return ACP_load_pack((char*)raw_data + ACP_get_css_hdr_len(sig_ver),
+		size - ACP_get_css_hdr_len(sig_ver), sig_ver, AC_UNINSTALL_JTA, (ACPack*)pack);
 }
 
 BH_RET ACP_pload_uns_nta(const void *raw_data, unsigned size, ACUnsTAPackExt *pack)
 {
-    if (NULL == raw_data || size <= BH_ACP_CSS_HEADER_LENGTH || NULL == pack)
-        return BHE_BAD_PARAMETER;
-    return ACP_load_pack((char*)raw_data + BH_ACP_CSS_HEADER_LENGTH,
-                         size - BH_ACP_CSS_HEADER_LENGTH, AC_UNINSTALL_NTA, (ACPack*)pack);
+	int sig_ver = ACP_get_sig_version(raw_data, size);
+
+	if (sig_ver == 0 || NULL == raw_data || size <= ACP_get_css_hdr_len(sig_ver) || NULL == pack)
+		return BHE_BAD_PARAMETER;
+	return ACP_load_pack((char*)raw_data + ACP_get_css_hdr_len(sig_ver),
+		size - ACP_get_css_hdr_len(sig_ver), sig_ver, AC_UNINSTALL_NTA, (ACPack*)pack);
 }
 
 BH_RET ACP_pload_ins_jta_prop(const void *raw_data, unsigned size, ACInsJTAPropExt *pack)
 {
     if (NULL == raw_data || NULL == pack)
         return BHE_BAD_PARAMETER;
-    return ACP_load_pack((char*)raw_data, size, AC_INSTALL_JTA_PROP, (ACPack*)pack);
+    return ACP_load_pack((char*)raw_data, size, 0, AC_INSTALL_JTA_PROP, (ACPack*)pack);
 }
 
 BH_RET ACP_pload_update_svl(const void *raw_data, unsigned size, ACUpdateSVLPackExt *pack)
 {
-    if (NULL == raw_data || size <= BH_ACP_CSS_HEADER_LENGTH || NULL == pack)
-        return BHE_BAD_PARAMETER;
-    return ACP_load_pack((char*)raw_data + BH_ACP_CSS_HEADER_LENGTH,
-                         size - BH_ACP_CSS_HEADER_LENGTH, AC_UPDATE_SVL, (ACPack*)pack);
+	int sig_ver = ACP_get_sig_version(raw_data, size);
+
+	if (sig_ver == 0 || NULL == raw_data || size <= ACP_get_css_hdr_len(sig_ver) || NULL == pack)
+		return BHE_BAD_PARAMETER;
+	return ACP_load_pack((char*)raw_data + ACP_get_css_hdr_len(sig_ver),
+		size - ACP_get_css_hdr_len(sig_ver), sig_ver, AC_UPDATE_SVL, (ACPack*)pack);
 }
 
 BH_RET ACP_get_cmd_id(const void *raw_data, unsigned size, int* cmd_id)
@@ -159,12 +173,13 @@ BH_RET ACP_get_cmd_id(const void *raw_data, unsigned size, int* cmd_id)
     BH_RET ret = BH_SUCCESS;
     PackReader pr = {0};
     ACPackHeader *ph = 0;
+	int sig_ver = ACP_get_sig_version(raw_data, size);
 
-    if (NULL == raw_data || size <= BH_ACP_CSS_HEADER_LENGTH || NULL == cmd_id)
+    if (sig_ver == 0 || NULL == raw_data || size <= ACP_get_css_hdr_len(sig_ver) || NULL == cmd_id)
         return BHE_BAD_PARAMETER;
 
     *cmd_id = AC_CMD_INVALID;
-    if (BH_SUCCESS != pr_init((char*)raw_data+BH_ACP_CSS_HEADER_LENGTH, size-BH_ACP_CSS_HEADER_LENGTH, &pr))
+    if (BH_SUCCESS != pr_init((char*)raw_data + ACP_get_css_hdr_len(sig_ver), size - ACP_get_css_hdr_len(sig_ver), &pr))
         return BHE_INVALID_BPK_FILE;
     if (BH_SUCCESS != (ret = ACP_load_pack_head(&pr, &ph)))
         return ret;

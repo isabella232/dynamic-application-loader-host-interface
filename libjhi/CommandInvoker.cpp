@@ -142,10 +142,10 @@ namespace intel_dal
 			JHI_CMD_INSTALL* install = (JHI_CMD_INSTALL*)(((JHI_COMMAND*) inputBuffer)->data);
 			*install = install_data;
 
-			memcpy_s(install->AppId,LEN_APP_ID+1,AppId,LEN_APP_ID+1);
+			memmove_s(install->AppId,LEN_APP_ID+1,AppId,LEN_APP_ID+1);
 
 			uint8_t* srcfile = install->data;
-			memcpy_s(srcfile,install_data.SrcFile_size,pSrcFile,install_data.SrcFile_size);
+			memmove_s(srcfile,install_data.SrcFile_size,pSrcFile,install_data.SrcFile_size);
 
 			// send the command buffer
 			if (!InvokeCommand(inputBuffer,cmd.dataLength,&outputBuffer,&outputBufferSize))
@@ -195,7 +195,7 @@ namespace intel_dal
 		uint32_t outputBufferSize;
 
 		JHI_CMD_UNINSTALL uninstall_data;
-		memcpy_s(uninstall_data.AppId,LEN_APP_ID+1,AppId,LEN_APP_ID+1);
+		memmove_s(uninstall_data.AppId,LEN_APP_ID+1,AppId,LEN_APP_ID+1);
 
 		cmd.id = UNINSTALL;
 		cmd.dataLength = sizeof(JHI_COMMAND)+sizeof(JHI_CMD_UNINSTALL) -1;
@@ -215,7 +215,7 @@ namespace intel_dal
 			*((JHI_COMMAND*) inputBuffer) = cmd;
 
 			JHI_CMD_UNINSTALL* uninstall = (JHI_CMD_UNINSTALL*)(((JHI_COMMAND*) inputBuffer)->data);
-			memcpy_s(uninstall,sizeof(JHI_CMD_UNINSTALL),&uninstall_data,sizeof(JHI_CMD_UNINSTALL));
+			memmove_s(uninstall,sizeof(JHI_CMD_UNINSTALL),&uninstall_data,sizeof(JHI_CMD_UNINSTALL));
 
 			// send the command buffer
 			if (!InvokeCommand(inputBuffer,cmd.dataLength,&outputBuffer,&outputBufferSize))
@@ -270,7 +270,7 @@ namespace intel_dal
 		JHI_CMD_GET_SESSIONS_COUNT command_data;
 
 		memset(&command_data,0,sizeof(JHI_CMD_GET_SESSIONS_COUNT));
-		memcpy_s(command_data.AppId,LEN_APP_ID+1,AppId,LEN_APP_ID+1);
+		memmove_s(command_data.AppId,LEN_APP_ID+1,AppId,LEN_APP_ID+1);
 
 		cmd.id = GET_SESSIONS_COUNT;
 		cmd.dataLength = sizeof(JHI_COMMAND)+sizeof(JHI_CMD_GET_SESSIONS_COUNT) -1;
@@ -290,7 +290,7 @@ namespace intel_dal
 			*((JHI_COMMAND*) inputBuffer) = cmd;
 
 			JHI_CMD_GET_SESSIONS_COUNT* cmd_data = (JHI_CMD_GET_SESSIONS_COUNT*)(((JHI_COMMAND*) inputBuffer)->data);
-			memcpy_s(cmd_data,sizeof(JHI_CMD_GET_SESSIONS_COUNT),&command_data,sizeof(JHI_CMD_GET_SESSIONS_COUNT));
+			memmove_s(cmd_data,sizeof(JHI_CMD_GET_SESSIONS_COUNT),&command_data,sizeof(JHI_CMD_GET_SESSIONS_COUNT));
 
 			// send the command buffer
 			if (!InvokeCommand(inputBuffer,cmd.dataLength,&outputBuffer,&outputBufferSize))
@@ -375,12 +375,12 @@ namespace intel_dal
 			JHI_CMD_CREATE_SESSION* cSession = (JHI_CMD_CREATE_SESSION*)(((JHI_COMMAND*) inputBuffer)->data);
 			*cSession = cmd_data;
 
-			memcpy_s(cSession->AppId,LEN_APP_ID+1,AppId,LEN_APP_ID+1);
+			memmove_s(cSession->AppId,LEN_APP_ID+1,AppId,LEN_APP_ID+1);
 
 			if (initBuffer->length > 0)
 			{
 				uint8_t* pBuffer = cSession->data;
-				memcpy_s(pBuffer,initBuffer->length,initBuffer->buffer,initBuffer->length);
+				memmove_s(pBuffer,initBuffer->length,initBuffer->buffer,initBuffer->length);
 			}
 
 			// send the command buffer
@@ -402,7 +402,7 @@ namespace intel_dal
 			{
 				// update OUT parameters
 				JHI_RES_CREATE_SESSION* res_data = (JHI_RES_CREATE_SESSION*) res->data;
-				memcpy_s(pSessionID,sizeof(JHI_SESSION_ID),&(res_data->SessionID),sizeof(JHI_SESSION_ID));
+				memmove_s(pSessionID,sizeof(JHI_SESSION_ID),&(res_data->SessionID),sizeof(JHI_SESSION_ID));
 			}
 
 			ret = res->retCode;
@@ -438,8 +438,8 @@ namespace intel_dal
 		uint32_t outputBufferSize;
 
 		JHI_CMD_CLOSE_SESSION cmd_data;
-		memcpy_s(&cmd_data.SessionID,sizeof(JHI_SESSION_ID),SessionID,sizeof(JHI_SESSION_ID));
-		memcpy_s(&cmd_data.processInfo,sizeof(JHI_PROCESS_INFO),processInfo,sizeof(JHI_PROCESS_INFO));
+		memmove_s(&cmd_data.SessionID,sizeof(JHI_SESSION_ID),SessionID,sizeof(JHI_SESSION_ID));
+		memmove_s(&cmd_data.processInfo,sizeof(JHI_PROCESS_INFO),processInfo,sizeof(JHI_PROCESS_INFO));
 		cmd_data.force = force;
 
 		cmd.id = CLOSE_SESSION;
@@ -513,7 +513,7 @@ namespace intel_dal
 		uint32_t outputBufferSize;
 
 		JHI_CMD_GET_SESSION_INFO command_data;
-		memcpy_s(&command_data.SessionID, sizeof(JHI_SESSION_ID), SessionID, sizeof(JHI_SESSION_ID));
+		memmove_s(&command_data.SessionID, sizeof(JHI_SESSION_ID), SessionID, sizeof(JHI_SESSION_ID));
 
 		cmd.id = GET_SESSION_INFO;
 		cmd.dataLength = sizeof(JHI_COMMAND) + sizeof(JHI_CMD_GET_SESSION_INFO) - 1;
@@ -591,7 +591,7 @@ namespace intel_dal
 
 		JHI_CMD_SET_SESSION_EVENT_HANDLER cmd_data;
 		cmd_data.handleName_size = (uint32_t)(strlen(handleName) + 1);
-		memcpy_s(&cmd_data.SessionID,sizeof(JHI_SESSION_ID),SessionID,sizeof(JHI_SESSION_ID));
+		memmove_s(&cmd_data.SessionID,sizeof(JHI_SESSION_ID),SessionID,sizeof(JHI_SESSION_ID));
 
 		cmd.id = SET_SESSION_EVENT_HANDLER;
 		cmd.dataLength = sizeof(JHI_COMMAND)+sizeof(JHI_CMD_SET_SESSION_EVENT_HANDLER)+cmd_data.handleName_size -2;
@@ -614,7 +614,7 @@ namespace intel_dal
 			*pCmd = cmd_data;
 
 			char* pHandleName = (char*) pCmd->data;
-			memcpy_s(pHandleName,cmd_data.handleName_size,handleName,cmd_data.handleName_size);
+			memmove_s(pHandleName,cmd_data.handleName_size,handleName,cmd_data.handleName_size);
 
 			// send the command buffer
 			if (!InvokeCommand(inputBuffer,cmd.dataLength,&outputBuffer,&outputBufferSize))
@@ -667,7 +667,7 @@ namespace intel_dal
 		uint32_t outputBufferSize;
 
 		JHI_CMD_GET_EVENT_DATA command_data;
-		memcpy_s(&command_data.SessionID, sizeof(JHI_SESSION_ID), SessionID, sizeof(JHI_SESSION_ID));
+		memmove_s(&command_data.SessionID, sizeof(JHI_SESSION_ID), SessionID, sizeof(JHI_SESSION_ID));
 
 		cmd.id = GET_EVENT_DATA;
 		cmd.dataLength = sizeof(JHI_COMMAND) + sizeof(JHI_CMD_GET_EVENT_DATA) - 1;
@@ -732,7 +732,7 @@ namespace intel_dal
 					break;
 				}
 
-				memcpy_s(*pDataBuffer, res_data->DataBuffer_size, res_data->data, res_data->DataBuffer_size);
+				memmove_s(*pDataBuffer, res_data->DataBuffer_size, res_data->data, res_data->DataBuffer_size);
 			}
 		} while (0);
 
@@ -771,7 +771,7 @@ namespace intel_dal
 		command_data.SendBuffer_size = SendBufferSize;
 		command_data.RecvBuffer_size = *RecvBufferSize;
 
-		memcpy_s(&command_data.SessionID, sizeof(JHI_SESSION_ID), SessionID, sizeof(JHI_SESSION_ID));
+		memmove_s(&command_data.SessionID, sizeof(JHI_SESSION_ID), SessionID, sizeof(JHI_SESSION_ID));
 
 		cmd.id = SEND_AND_RECIEVE;
 
@@ -797,7 +797,7 @@ namespace intel_dal
 			JHI_CMD_SEND_AND_RECIEVE* cmd_data = (JHI_CMD_SEND_AND_RECIEVE*)(((JHI_COMMAND*)inputBuffer)->data);
 			*cmd_data = command_data;
 
-			memcpy_s(cmd_data->data, SendBufferSize, SendBuffer, SendBufferSize);
+			memmove_s(cmd_data->data, SendBufferSize, SendBuffer, SendBufferSize);
 
 			// send the command buffer
 			if (!InvokeCommand(inputBuffer, cmd.dataLength, &outputBuffer, &outputBufferSize))
@@ -844,7 +844,7 @@ namespace intel_dal
 
 				if ((ret == JHI_SUCCESS) && (res_data->RecvBuffer_size > 0) && (*RecvBufferSize >= res_data->RecvBuffer_size))
 				{
-					memcpy_s(RecvBuffer, *RecvBufferSize, res_data->data, res_data->RecvBuffer_size);
+					memmove_s(RecvBuffer, *RecvBufferSize, res_data->data, res_data->RecvBuffer_size);
 				}
 
 				if (ret == JHI_SUCCESS || ret == JHI_INSUFFICIENT_BUFFER)
@@ -918,11 +918,11 @@ namespace intel_dal
 			if (SendBufferSize != 0)
 			{
 				// copy send buffer
-				memcpy_s(cmd_data->data, command_data.SendBuffer_size, SendBuffer, command_data.SendBuffer_size);
+				memmove_s(cmd_data->data, command_data.SendBuffer_size, SendBuffer, command_data.SendBuffer_size);
 			}
 
 			// copy appid
-			memcpy_s(cmd_data->AppId, LEN_APP_ID + 1, AppId, LEN_APP_ID + 1);
+			memmove_s(cmd_data->AppId, LEN_APP_ID + 1, AppId, LEN_APP_ID + 1);
 
 			// send the command buffer
 			if (!InvokeCommand(inputBuffer, cmd.dataLength, &outputBuffer, &outputBufferSize))
@@ -968,7 +968,7 @@ namespace intel_dal
 
 				if ((ret == JHI_SUCCESS) && (res_data->RecvBuffer_size > 0) && (command_data.RecvBuffer_size >= res_data->RecvBuffer_size) && RecvBuffer != NULL)
 				{
-					memcpy_s(RecvBuffer, command_data.RecvBuffer_size, res_data->data, res_data->RecvBuffer_size);
+					memmove_s(RecvBuffer, command_data.RecvBuffer_size, res_data->data, res_data->RecvBuffer_size);
 				}
 
 				if (ret == JHI_SUCCESS || ret == JHI_INSUFFICIENT_BUFFER)
@@ -1044,7 +1044,7 @@ namespace intel_dal
 
 			if (ret == JHI_SUCCESS)
 			{
-				memcpy_s(pVersionInfo, sizeof(JHI_VERSION_INFO), res->data, sizeof(JHI_VERSION_INFO));
+				memmove_s(pVersionInfo, sizeof(JHI_VERSION_INFO), res->data, sizeof(JHI_VERSION_INFO));
 			}
 
 		} while (0);
@@ -1101,7 +1101,7 @@ namespace intel_dal
 
 			JHI_CMD_CREATE_SD_SESSION* cSession = (JHI_CMD_CREATE_SD_SESSION*)(((JHI_COMMAND*) inputBuffer)->data);
 
-			memcpy_s(cSession->sdId, LEN_APP_ID, sdId.c_str(), LEN_APP_ID);
+			memmove_s(cSession->sdId, LEN_APP_ID, sdId.c_str(), LEN_APP_ID);
 
 			cSession->sdId[LEN_APP_ID] = '\0';
 
@@ -1269,7 +1269,7 @@ namespace intel_dal
 			cmdPkg->sdHandle = (uint64_t)sdHandle;
 
 			uint8_t* blob = cmdPkg->blob;
-			memcpy_s(blob, send_cmd_pkg_data.blobSize, package, send_cmd_pkg_data.blobSize);			
+			memmove_s(blob, send_cmd_pkg_data.blobSize, package, send_cmd_pkg_data.blobSize);			
 
 			// send the command buffer
 			if (!InvokeCommand(inputBuffer, cmd.dataLength, &outputBuffer, &outputBufferSize))
@@ -1387,7 +1387,7 @@ namespace intel_dal
 
 		uuidList->uuidCount = resData->count;
 		uuidList->uuids = (UUID_STR*) JHI_ALLOC(dataBufferLen);
-		memcpy_s(uuidList->uuids, dataBufferLen, resData->data, dataBufferLen);
+		memmove_s(uuidList->uuids, dataBufferLen, resData->data, dataBufferLen);
 
 		// verify the uuids
 		if (!validateUuidList(uuidList))
@@ -1508,7 +1508,7 @@ cleanup:
 
 		uuidList->uuidCount = resData->count;
 		uuidList->uuids = (UUID_STR*)JHI_ALLOC(dataBufferLen);
-		memcpy_s(uuidList->uuids, dataBufferLen, resData->data, dataBufferLen);
+		memmove_s(uuidList->uuids, dataBufferLen, resData->data, dataBufferLen);
 
 		// verify the uuids
 		if (!validateUuidList(uuidList))
@@ -1608,7 +1608,7 @@ cleanup:
 		dataBufferLen = res->dataLength - (sizeof(JHI_RESPONSE) - 1) - (sizeof(JHI_RES_QUERY_TEE_METADATA) - 1); // The length of the inner data.
 
 		if (dataBufferLen >= max_length) // We are copying by the caller's expected size so we have to check that we have enough data to fill it
-			memcpy_s(metadata, max_length, resData->metadata, max_length);
+			memmove_s(metadata, max_length, resData->metadata, max_length);
 		else
 		{
 			ret = TEE_STATUS_INTERNAL_ERROR;
@@ -1862,7 +1862,7 @@ cleanup:
 			// update OUT parameters
 			JHI_RES_GET_SESSIONS_DATA_TABLE* res_data = (JHI_RES_GET_SESSIONS_DATA_TABLE*) JHI_ALLOC(tableSize);
 
-			memcpy_s(res_data, tableSize, res->data, tableSize);
+			memmove_s(res_data, tableSize, res->data, tableSize);
 			if (res_data->SessionDataTable.sessionsCount == 0)
 			{
 				*SessionDataTable = &res_data->SessionDataTable;

@@ -191,7 +191,7 @@ JHI_RET_I
 		//check if there's an open session, if not, open one
 		if (!sessionsManager.hasLiveSessions(pAppId))
 		{
-			TRACE0("Get applet property was callled for and applet without an open session. A session needs to be created.");
+			TRACE0("Get applet property was callled for an applet without an open session. A session needs to be created.");
 			DATA_BUFFER tmpBuffer;
 			tmpBuffer.buffer = NULL;
 			tmpBuffer.length = 0;

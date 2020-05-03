@@ -265,6 +265,7 @@
       <PreprocessorDefinitions>WINDOWS_7_SUPPORT;TRACER_NAME="TEE_Management_Lib: ";WIN32_LEAN_AND_MEAN;WIN32;CS_SOCKETS_COMMUNICATION;_DEBUG;_WINDOWS;_USRDLL;TEEMANAGEMENT_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)..\libjhi;$(SolutionDir)..\common\include;$(SolutionDir)..\thirdparty\bhplugin2\FW\src\apps\dal_ivm;$(SolutionDir)..\thirdparty\bhplugin2\include</AdditionalIncludeDirectories>
       <ShowIncludes>false</ShowIncludes>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -305,6 +306,7 @@
       <PreprocessorDefinitions>WINDOWS_7_SUPPORT;TRACER_NAME="TEE_Management_Lib: ";WIN32_LEAN_AND_MEAN;WIN32;CS_SOCKETS_COMMUNICATION;_DEBUG;_WINDOWS;_USRDLL;TEEMANAGEMENT_EXPORTS;SCHANNEL_OVER_SOCKET;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)..\libjhi;$(SolutionDir)..\common\include;$(SolutionDir)..\thirdparty\bhplugin2\FW\src\apps\dal_ivm;$(SolutionDir)..\thirdparty\bhplugin2\include</AdditionalIncludeDirectories>
       <ShowIncludes>false</ShowIncludes>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -324,6 +326,7 @@
       <PreprocessorDefinitions>WINDOWS_7_SUPPORT;TRACER_NAME="TEE_Management_Lib: ";WIN32_LEAN_AND_MEAN;WIN32;CS_SOCKETS_COMMUNICATION;_DEBUG;_WINDOWS;_USRDLL;TEEMANAGEMENT_EXPORTS;%(PreprocessorDefinitions);WIN64</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)..\libjhi;$(SolutionDir)..\common\include;$(SolutionDir)..\thirdparty\bhplugin2\FW\src\apps\dal_ivm;$(SolutionDir)..\thirdparty\bhplugin2\include</AdditionalIncludeDirectories>
       <ShowIncludes>false</ShowIncludes>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -366,6 +369,7 @@
       <PreprocessorDefinitions>WINDOWS_7_SUPPORT;TRACER_NAME="TEE_Management_Lib: ";WIN32_LEAN_AND_MEAN;WIN32;CS_SOCKETS_COMMUNICATION;SCHANNEL_OVER_SOCKET;_DEBUG;_WINDOWS;_USRDLL;TEEMANAGEMENT_EXPORTS;%(PreprocessorDefinitions);WIN64</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)..\libjhi;$(SolutionDir)..\common\include;$(SolutionDir)..\thirdparty\bhplugin2\FW\src\apps\dal_ivm;$(SolutionDir)..\thirdparty\bhplugin2\include</AdditionalIncludeDirectories>
       <ShowIncludes>false</ShowIncludes>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -388,6 +392,7 @@
       <PreprocessorDefinitions>WINDOWS_7_SUPPORT;TRACER_NAME="TEE_Management_Lib: ";MYDLLLIB_EXPORTS;WIN32_LEAN_AND_MEAN;WIN32;CS_SOCKETS_COMMUNICATION;NDEBUG;_WINDOWS;_USRDLL;TEEMANAGEMENT_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)..\libjhi;$(SolutionDir)..\common\include;$(SolutionDir)..\thirdparty\bhplugin2\FW\src\apps\dal_ivm;$(SolutionDir)..\thirdparty\bhplugin2\include</AdditionalIncludeDirectories>
       <ShowIncludes>false</ShowIncludes>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -436,6 +441,7 @@
       <PreprocessorDefinitions>WINDOWS_7_SUPPORT;TRACER_NAME="TEE_Management_Lib: ";MYDLLLIB_EXPORTS;WIN32_LEAN_AND_MEAN;WIN32;CS_SOCKETS_COMMUNICATION;NDEBUG;_WINDOWS;_USRDLL;TEEMANAGEMENT_EXPORTS;SCHANNEL_OVER_SOCKET;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)..\libjhi;$(SolutionDir)..\common\include;$(SolutionDir)..\thirdparty\bhplugin2\FW\src\apps\dal_ivm;$(SolutionDir)..\thirdparty\bhplugin2\include</AdditionalIncludeDirectories>
       <ShowIncludes>false</ShowIncludes>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -459,6 +465,7 @@
       <PreprocessorDefinitions>WINDOWS_7_SUPPORT;TRACER_NAME="TEE_Management_Lib: ";WIN32_LEAN_AND_MEAN;WIN32;CS_SOCKETS_COMMUNICATION;NDEBUG;_WINDOWS;_USRDLL;TEEMANAGEMENT_EXPORTS;%(PreprocessorDefinitions);WIN64</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)..\libjhi;$(SolutionDir)..\common\include;$(SolutionDir)..\thirdparty\bhplugin2\FW\src\apps\dal_ivm;$(SolutionDir)..\thirdparty\bhplugin2\include</AdditionalIncludeDirectories>
       <ShowIncludes>false</ShowIncludes>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -509,6 +516,7 @@
       <PreprocessorDefinitions>WINDOWS_7_SUPPORT;TRACER_NAME="TEE_Management_Lib: ";WIN32_LEAN_AND_MEAN;WIN32;CS_SOCKETS_COMMUNICATION;SCHANNEL_OVER_SOCKET;NDEBUG;_WINDOWS;_USRDLL;TEEMANAGEMENT_EXPORTS;%(PreprocessorDefinitions);WIN64</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)..\libjhi;$(SolutionDir)..\common\include;$(SolutionDir)..\thirdparty\bhplugin2\FW\src\apps\dal_ivm;$(SolutionDir)..\thirdparty\bhplugin2\include</AdditionalIncludeDirectories>
       <ShowIncludes>false</ShowIncludes>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

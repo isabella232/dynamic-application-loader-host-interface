@@ -125,12 +125,12 @@ static BH_RET ACP_load_ins_sd_head(PackReader* pr, ACInsSDHeader **head)
     return BHE_INVALID_BPK_FILE;
 }
 
-static BH_RET ACP_load_ins_sd_sig(PackReader* pr, ACInsSDSigKey **sig)
+static BH_RET ACP_load_ins_sd_sig(PackReader* pr, int sig_ver, ACInsSDSigKey **sig)
 {
     /*check buffer border before read the value to avoid access violation*/
-    if (BH_SUCCESS == pr_is_safe_to_read(pr, sizeof(ACInsSDSigKey))) {
+    if (BH_SUCCESS == pr_is_safe_to_read(pr, sizeof(ACInsSDSigKey) + ACP_get_sig_key_len(sig_ver))) {
             *sig = (ACInsSDSigKey*)pr->cur;
-            return pr_align_move(pr, sizeof(ACInsSDSigKey));
+            return pr_align_move(pr, sizeof(ACInsSDSigKey) + ACP_get_sig_key_len(sig_ver));
     }
     return BHE_INVALID_BPK_FILE;
 }
@@ -289,12 +289,12 @@ BH_RET ACP_load_ta_pack(PackReader* pr, char **ta_pack)
     return BHE_INVALID_BPK_FILE;
 }
 
-BH_RET ACP_load_ins_sd(PackReader* pr, ACInsSDPack* pack)
+BH_RET ACP_load_ins_sd(PackReader* pr, int sig_ver, ACInsSDPack* pack)
 {
     BH_RET ret = BHE_INVALID_BPK_FILE;
     if((BH_SUCCESS != (ret = ACP_load_prop(pr, &(pack->ins_cond))))
        || (BH_SUCCESS != (ret = ACP_load_ins_sd_head(pr, &(pack->head))))
-       || (BH_SUCCESS != (ret = ACP_load_ins_sd_sig(pr, &(pack->sig_key)))))
+       || (BH_SUCCESS != (ret = ACP_load_ins_sd_sig(pr, sig_ver, &(pack->sig_key)))))
         return ret;
     return BH_SUCCESS;
 }
@@ -326,38 +326,38 @@ BH_RET ACP_load_ins_jta_prop(PackReader* pr, ACInsJTAProp* pack)
     return BH_SUCCESS;
 }
 
-static BH_RET ACP_load_ins_jta_head(PackReader* pr, ACInsJTAHeader **head)
+static BH_RET ACP_load_ins_jta_head(PackReader* pr, int sig_ver, ACInsJTAHeader **head)
 {
-    if (BH_SUCCESS == pr_is_safe_to_read(pr, sizeof(ACInsJTAHeader))) {
+    if (BH_SUCCESS == pr_is_safe_to_read(pr, sizeof(ACInsJTAHeader) + ACP_get_hash_pack_len(sig_ver))) {
         *head = (ACInsJTAHeader*)(pr->cur);
-        return pr_align_move(pr, sizeof(ACInsJTAHeader));
+        return pr_align_move(pr, sizeof(ACInsJTAHeader) + ACP_get_hash_pack_len(sig_ver));
     }
     return BHE_INVALID_BPK_FILE;
 }
 
-BH_RET ACP_load_ins_jta(PackReader* pr, ACInsJTAPack* pack)
+BH_RET ACP_load_ins_jta(PackReader* pr, int sig_ver, ACInsJTAPack* pack)
 {
     BH_RET ret = BHE_INVALID_BPK_FILE;
     if((BH_SUCCESS != (ret = ACP_load_prop(pr, &(pack->ins_cond))))
-       || (BH_SUCCESS != (ret = ACP_load_ins_jta_head(pr, &(pack->head)))))
+       || (BH_SUCCESS != (ret = ACP_load_ins_jta_head(pr, sig_ver, &(pack->head)))))
         return ret;
     return BH_SUCCESS;
 }
 
-static BH_RET ACP_load_ins_nta_head(PackReader* pr, ACInsNTAHeader **head)
+static BH_RET ACP_load_ins_nta_head(PackReader* pr, int sig_ver, ACInsNTAHeader **head)
 {
-    if (BH_SUCCESS == pr_is_safe_to_read(pr, sizeof(ACInsNTAHeader))) {
+    if (BH_SUCCESS == pr_is_safe_to_read(pr, sizeof(ACInsNTAHeader) + ACP_get_hash_pack_len(sig_ver))) {
         *head = (ACInsNTAHeader*)(pr->cur);
-        return pr_align_move(pr, sizeof(ACInsNTAHeader));
+        return pr_align_move(pr, sizeof(ACInsNTAHeader) + ACP_get_hash_pack_len(sig_ver));
     }
     return BHE_INVALID_BPK_FILE;
 }
 
-BH_RET ACP_load_ins_nta(PackReader* pr, ACInsNTAPack* pack)
+BH_RET ACP_load_ins_nta(PackReader* pr, int sig_ver, ACInsNTAPack* pack)
 {
     BH_RET ret = BHE_INVALID_BPK_FILE;
     if((BH_SUCCESS != (ret = ACP_load_prop(pr, &(pack->ins_cond))))
-       || (BH_SUCCESS != (ret = ACP_load_ins_nta_head(pr, &(pack->head))))
+       || (BH_SUCCESS != (ret = ACP_load_ins_nta_head(pr, sig_ver, &(pack->head))))
        || (BH_SUCCESS != (ret = ACP_load_metadata(pr, &(pack->mdata)))))
         return ret;
     return BH_SUCCESS;
@@ -384,6 +384,53 @@ BH_RET ACP_load_pack_head(PackReader* pr, ACPackHeader **head)
         return pr_align_move(pr, sizeof(ACPackHeader));
     }
     return BHE_INVALID_BPK_FILE;
+}
+
+#define SIG_VER_OFFSET	(44)
+int ACP_get_sig_version(const char *data, unsigned size)
+{
+	int32_t sig_ver;
+
+	if (size < SIG_VER_OFFSET + sizeof(sig_ver))
+		return 0;
+
+	sig_ver = *(int32_t *)(data + SIG_VER_OFFSET);
+
+	if (sig_ver == BH_SIG_VERSION_1 || sig_ver == BH_SIG_VERSION_2)
+		return sig_ver;
+
+	return 0;
+}
+
+int ACP_get_sig_key_len(int sig_ver)
+{
+	switch (sig_ver)
+	{
+	case BH_SIG_VERSION_1: return 260;
+	case BH_SIG_VERSION_2: return 288;
+	default: return 0;
+	}
+}
+
+int ACP_get_hash_pack_len(int sig_ver)
+{
+	switch (sig_ver)
+	{
+	case BH_SIG_VERSION_1: return 32;
+	case BH_SIG_VERSION_2: return BH_MAX_PACK_HASH_LEN;
+	default: return 0;
+	}
+}
+
+// Intel CSS Header + CSS Cypto Block which prefixes each signed ACP pkg
+int ACP_get_css_hdr_len(int sig_ver)
+{
+	switch (sig_ver)
+	{
+	case BH_SIG_VERSION_1: return (128 + 520);
+	case BH_SIG_VERSION_2: return (128 + 776);
+	default: return 0;
+	}
 }
 
 /*

@@ -315,7 +315,7 @@ namespace intel_dal
 		DWORD LastError;
 
 		// Connect to HCI client in the FW
-		memcpy_s( ProtocolId,sizeof(ProtocolId), (PVOID)&HCI_HECI_DYNAMIC_CLIENT_GUID, sizeof(ProtocolId) );
+		memmove_s( ProtocolId,sizeof(ProtocolId), (PVOID)&HCI_HECI_DYNAMIC_CLIENT_GUID, sizeof(ProtocolId) );
 		if( DeviceIoControl( *pHandle, IOCTL_HECI_CONNECT_CLIENT,ProtocolId, 16, 
 			&DrvClientProp, sizeof(DrvClientProp), &PropertiesSize, NULL ) == 0 )
 		{

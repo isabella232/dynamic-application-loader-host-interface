@@ -69,7 +69,7 @@ namespace Jhi_Plugin_1
 		UINT32 JHI_Plugin_GetPluginType();
 
 		UINT32 JHI_Plugin_DownloadApplet (const char *pAppId, uint8_t* pAppBlob, unsigned int BlobSize);
-		UINT32 JHI_Plugin_UnloadApplet (const char *AppId );
+		UINT32 JHI_Plugin_UnloadApplet (const char *AppId, int sigVersion);
 
 		UINT32 JHI_Plugin_GetAppletProperty (const char *AppId, JVM_COMM_BUFFER *pIOBuffer);
 

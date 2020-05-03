@@ -34,9 +34,6 @@ extern "C" {
 #include "bh_shared_errcode.h"
 #include "bh_acp_format.h"
 
-// Intel CSS Header + CSS Cypto Block which prefixes each signed ACP pkg
-#define BH_ACP_CSS_HEADER_LENGTH    (128 + 520) // CSS Header + CSS Crypto Block
-
 /*PackReader hold a reference of raw pack and read items with alignment support*/
 typedef struct {
     const char *cur;
@@ -53,18 +50,23 @@ BH_RET ACP_load_pack_head(PackReader *pr, ACPackHeader** head);
 
 BH_RET ACP_load_prop(PackReader *pr, ACProp** props);
 
-BH_RET ACP_load_ins_sd(PackReader *pr, ACInsSDPack* pack);
+BH_RET ACP_load_ins_sd(PackReader* pr, int sig_ver, ACInsSDPack* pack);
 
 BH_RET ACP_load_uns_sd(PackReader *pr, ACUnsSDPack* pack);
 
-BH_RET ACP_load_ins_jta(PackReader *pr, ACInsJTAPack* pack);
+BH_RET ACP_load_ins_jta(PackReader* pr, int sig_ver, ACInsJTAPack* pack);
 
-BH_RET ACP_load_ins_nta(PackReader *pr, ACInsNTAPack* pack);
+BH_RET ACP_load_ins_nta(PackReader* pr, int sig_ver, ACInsNTAPack* pack);
 
 BH_RET ACP_load_uns_ta(PackReader *pr, ACUnsTAPack* pack);
 BH_RET ACP_load_ta_pack(PackReader *pr, char** ta_pack);
 BH_RET ACP_load_ins_jta_prop(PackReader *pr, ACInsJTAProp* pack);
 BH_RET ACP_load_update_svl(PackReader* pr, ACUpdateSVLPack* pack);
+
+int ACP_get_sig_version(const char *data, unsigned size);
+int ACP_get_sig_key_len(int sig_ver);
+int ACP_get_hash_pack_len(int sig_ver);
+int ACP_get_css_hdr_len(int sig_ver);
 #ifdef __cplusplus
 }
 #endif

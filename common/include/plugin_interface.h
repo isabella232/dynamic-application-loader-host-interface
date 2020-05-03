@@ -84,7 +84,7 @@ extern "C" {
 		virtual UINT32 JHI_Plugin_Set_Transport_And_Memory(unsigned int transportType, JHI_PLUGIN_MEMORY_API* plugin_memory_api) = 0;
 		virtual UINT32 JHI_Plugin_GetPluginType() = 0;
 		virtual UINT32 JHI_Plugin_DownloadApplet (const char *pAppId, uint8_t* pAppBlob, unsigned int BlobSize) = 0;
-		virtual UINT32 JHI_Plugin_UnloadApplet (const char *AppId ) = 0;
+		virtual UINT32 JHI_Plugin_UnloadApplet (const char *AppId, int sig_version) = 0;
 		virtual UINT32 JHI_Plugin_GetAppletProperty (const char *AppId, JVM_COMM_BUFFER *pIOBuffer) = 0;
 		virtual UINT32 JHI_Plugin_CreateSession (const char *AppId, VM_SESSION_HANDLE* pSession, const uint8_t* pAppBlob, unsigned int BlobSize, JHI_SESSION_ID SessionID,DATA_BUFFER* initBuffer) = 0;
 		virtual UINT32 JHI_Plugin_CloseSession (VM_SESSION_HANDLE* pSession) = 0;

@@ -79,7 +79,7 @@ Cleanup:
 
 	if (TEE_SUCCESS == status) {
 		impl_handle->handle = deviceHandle;
-		error_status_t result  = memcpy_s(&impl_handle->uuid, sizeof(impl_handle->uuid), uuid, sizeof(UUID));
+		error_status_t result  = memmove_s(&impl_handle->uuid, sizeof(impl_handle->uuid), uuid, sizeof(UUID));
 		if (result != 0) {
 			ERRPRINT("Error in in uuid copy: result %u\n", result);
 			status = TEE_UNABLE_TO_COMPLETE_OPERATION;

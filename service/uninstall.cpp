@@ -104,11 +104,11 @@ jhis_unload(const char* pAppId, const SD_SESSION_HANDLE handle, vector<uint8_t>*
 	// known to be installed because installations
 	// are persistent.
 	TRACE0 ("Calling Plugin to unload the applet");
-	if (blob == NULL)
+	if (blob == NULL) // Uninstall applet using JHI dll
 	{
-		ulRetCode = plugin->JHI_Plugin_UnloadApplet(pAppId);
+		ulRetCode = plugin->JHI_Plugin_UnloadApplet(pAppId, GlobalsManager::Instance().getSigVersion());
 	}
-	else
+	else // Uninstall applet using TEEManagement dll
 	{
 		ulRetCode = plugin->JHI_Plugin_SendCmdPkg(handle, *blob);
 	}

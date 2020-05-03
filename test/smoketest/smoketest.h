@@ -89,7 +89,7 @@ using std::vector;
 	// helper functions
 	TEE_STATUS readFileAsBlob(const FILECHAR* filepath, vector<uint8_t>& blob);
 	void onEvent(JHI_SESSION_HANDLE SessionHandle,JHI_EVENT_DATA eventData);
-	int AppPropertyCall(JHI_HANDLE hJOM, const FILECHAR *AppProperty, UINT8 rxBuffer[APP_PROPERTY_BUFFER_SIZE], JVM_COMM_BUFFER* txrx);
+	int AppPropertyCall(JHI_HANDLE hJOM, const FILECHAR *AppProperty, FILECHAR rxBuffer[APP_PROPERTY_BUFFER_SIZE], JVM_COMM_BUFFER* txrx);
 	void GetFullFilename(wchar_t* szCurDir, wchar_t* fileName);
 	void exit_test(int result);
 	void print_menu();
@@ -107,9 +107,13 @@ using std::vector;
 
 #define ECHO_APP_ID "d1de41d82b844feaa7fa1e4322f15dee"
 #define ECHO_FILENAME FILEPREFIX("/echo.dalp")
-#define ECHO_ACP_INSTALL_FILENAME FILEPREFIX("/EchoInstall.acp")
-#define ECHO_ACP_UNINSTALL_FILENAME FILEPREFIX("/EchoUninstall.acp")
-#define ECHO_ACP_UPDATESVL_FILENAME FILEPREFIX("/UpdateSVL.acp")
+#define ECHO_ACP_INSTALL_SIG_VER_1_FILENAME FILEPREFIX("/EchoInstallSigVer1.acp")
+#define ECHO_ACP_UNINSTALL_SIG_VER_1_FILENAME FILEPREFIX("/EchoUninstallSigVer1.acp")
+#define ECHO_ACP_UPDATESVL_SIG_VER_1_FILENAME FILEPREFIX("/UpdateSVLSigVer1.acp")
+
+#define ECHO_ACP_INSTALL_SIG_VER_2_FILENAME FILEPREFIX("/EchoInstallSigVer2.acp")
+#define ECHO_ACP_UNINSTALL_SIG_VER_2_FILENAME FILEPREFIX("/EchoUninstallSigVer2.acp")
+#define ECHO_ACP_UPDATESVL_SIG_VER_2_FILENAME FILEPREFIX("/UpdateSVLSigVer2.acp")
 
 #define ACP_INSTALL_SD_FILENAME FILEPREFIX("/InstallSD.acp")
 #define ACP_UNINSTALL_SD_FILENAME FILEPREFIX("/UninstallSD.acp")
@@ -124,6 +128,8 @@ using std::vector;
 	//#define ECHO_FILENAME_TO_PRINT "sgx applet"
 
 #define ECHO_1_APP_ID "d1de41d82b844feaa7fa1e4322f15de1"
+#define SIG_VERSION_2K_APPLET_SIGNING 1
+#define SIG_VERSION_3K_APPLET_SIGNING 2
 
 #define EVENT_SERVICE_APP_ID "a525599fc5214aae9f952f268fa54416"
 #define EVENT_SERVICE_FILENAME FILEPREFIX("/EventService.dalp")

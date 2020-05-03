@@ -93,7 +93,7 @@ namespace intel_dal
 				ulRetCode = JHI_FILE_ERROR_COPY;
 				break;
 			}
-			if (chmod(DstFile.c_str(), S_IRWXO | S_IRWXG | S_IRWXU) != 0)
+			if (chmod(DstFile.c_str(), S_IRUSR | S_IWUSR) != 0) // Restrict read/write permissions to owner only
 			{
 				TRACE0 ("failed removing all attributes from file\n");
 				ulRetCode = JHI_FILE_ERROR_COPY;
@@ -102,15 +102,15 @@ namespace intel_dal
 #endif //win32
 
 
-			// 3. get the applet blob from the dalp file
-			ulRetCode = getAppletBlobs(DstFile,appletBlobs, isAcp);
+			// get the applet blob from the dalp / acp file
+			ulRetCode = getAppletBlobs(DstFile, appletBlobs, isAcp);
 			if (ulRetCode != JHI_SUCCESS)
 			{
-				TRACE0("failed getting applet blobs from dalp file\n");
+				TRACE0("prepareInstallFromFile(): Failed to get applet blobs from dalp file.\n");
 				break;
 			}
 
-			//4. if the applet is not installed (we don't have a record in the app table)
+			//   if the applet is not installed (we don't have a record in the app table)
 			//   create entry for the applet under its ID and set its state to PENDING.
 			//   otherwise do nothing (the applet is installed but we install it again in case there is a version update)
 			if (getAppletState(appletId) == NOT_INSTALLED)
@@ -182,7 +182,7 @@ namespace intel_dal
 				break;
 			}
 
-			if (chmod(DstFile.c_str(), S_IRWXO | S_IRWXG | S_IRWXU) != 0)
+			if (chmod(DstFile.c_str(), S_IRUSR | S_IWUSR) != 0) // Restrict read/write permissions to owner only
 			{
 				TRACE0 ("failed removing all attributes from file\n");
 				ulRetCode = JHI_FILE_ERROR_COPY;
@@ -371,6 +371,7 @@ namespace intel_dal
 
 			if (len >= MAX_APPLET_BLOB_SIZE)
 			{
+				TRACE0("Reached max applet blob size.");
 				ret = JHI_INVALID_PACKAGE_FORMAT;
 			}
 			std::istream_iterator<uint8_t> start(is), end;
@@ -381,6 +382,7 @@ namespace intel_dal
 		}
 		catch(...)
 		{
+			TRACE0("readFileAsBlob: caught exception.");
 			if (is.is_open())
 			{
 				is.close();				
@@ -393,44 +395,42 @@ namespace intel_dal
 
 	JHI_RET AppletsManager::getAppletBlobs(const FILESTRING& filepath, list< vector<uint8_t> >& appletBlobs, bool isAcp)
 	{
-		VERSION fwVersion = GlobalsManager::Instance().getFwVersion();
-
 		if (isAcp)
 		{
 			return readFileAsBlob(filepath, appletBlobs);
 		}
 
-		char FWVersionStr[FW_VERSION_STRING_MAX_LENGTH];
-
-		if (compareFileExtension(filepath, dalpFileExt))
+		if (!compareFileExtension(filepath, dalpFileExt))
 		{
-			AppletsPackageReader reader(filepath);
-
-			if (!reader.isPackageValid())
-			{
-				TRACE0 ("Invalid package file received\n");
-				return JHI_INVALID_PACKAGE_FORMAT;
-			}
-
-			// create a fw version string to compare against the versions in the dalp file.
-			sprintf_s(FWVersionStr, FW_VERSION_STRING_MAX_LENGTH, "%d.%d.%d",fwVersion.Major,fwVersion.Minor,fwVersion.Hotfix);
-
-			if (!reader.getAppletBlobs(FWVersionStr,appletBlobs))
-			{
-				TRACE0 ("get applet blob from dalp file failed!!\n");
-				return JHI_READ_FROM_FILE_FAILED;
-			}
-
-			if (appletBlobs.empty())
-			{
-				TRACE0 ("No compatible applets where found in the dalp file\n");
-				return JHI_INSTALL_FAILED;
-			}
-		}
-		else
-		{
+			TRACE0("Invalid dalp file extension.");
 			return JHI_INVALID_FILE_EXTENSION;
 		}
+		
+		VERSION fwVersion = GlobalsManager::Instance().getFwVersion();
+		char FWVersionStr[FW_VERSION_STRING_MAX_LENGTH];
+		AppletsPackageReader reader(filepath);
+
+		if (!reader.isPackageValid())
+		{
+			TRACE0 ("Invalid dalp file received.\n");
+			return JHI_INVALID_PACKAGE_FORMAT;
+		}
+
+		// create a fw version string to compare against the versions in the dalp file.
+		sprintf_s(FWVersionStr, FW_VERSION_STRING_MAX_LENGTH, "%d.%d.%d",fwVersion.Major,fwVersion.Minor,fwVersion.Hotfix);
+
+		if (!reader.getAppletBlobs(FWVersionStr, appletBlobs))
+		{
+			TRACE0 ("AppletsManager::getAppletBlobs: Failed to read applet blob from dalp file.\n");
+			return JHI_READ_FROM_FILE_FAILED;
+		}
+
+		if (appletBlobs.empty())
+		{
+			TRACE0 ("No compatible applets where found in the dalp file.\n");
+			return JHI_INSTALL_FAILED;
+		}
+		
 
 		return JHI_SUCCESS;
 	}

@@ -352,6 +352,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WINDOWS_7_SUPPORT;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)..\thirdparty\LibTEE\include;$(SolutionDir)..\common\include;$(SolutionDir)..\teetransport\transport\socket;$(SolutionDir)..\teetransport\transport\socket\lib;$(SolutionDir)..\teetransport\transport\libtee;$(SolutionDir)..\teetransport\transport\libtee\lib;$(SolutionDir)..\teetransport</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -402,6 +403,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)..\thirdparty\LibTEE\include;$(SolutionDir)..\common\include;$(SolutionDir)..\teetransport\transport\socket;$(SolutionDir)..\teetransport\transport\socket\lib;$(SolutionDir)..\teetransport\transport\libtee;$(SolutionDir)..\teetransport\transport\libtee\lib;$(SolutionDir)..\teetransport</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -452,6 +454,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WINDOWS_7_SUPPORT;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)..\thirdparty\LibTEE\include;$(SolutionDir)..\common\include;$(SolutionDir)..\teetransport\transport\socket;$(SolutionDir)..\teetransport\transport\socket\lib;$(SolutionDir)..\teetransport\transport\libtee;$(SolutionDir)..\teetransport\transport\libtee\lib;$(SolutionDir)..\teetransport</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -477,6 +480,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)..\thirdparty\LibTEE\include;$(SolutionDir)..\common\include;$(SolutionDir)..\teetransport\transport\socket;$(SolutionDir)..\teetransport\transport\socket\lib;$(SolutionDir)..\teetransport\transport\libtee;$(SolutionDir)..\teetransport\transport\libtee\lib;$(SolutionDir)..\teetransport</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -558,6 +562,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WINDOWS_7_SUPPORT;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)..\thirdparty\LibTEE\include;$(SolutionDir)..\common\include;$(SolutionDir)..\teetransport\transport\socket;$(SolutionDir)..\teetransport\transport\socket\lib;$(SolutionDir)..\teetransport\transport\libtee;$(SolutionDir)..\teetransport\transport\libtee\lib;$(SolutionDir)..\teetransport</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -616,6 +621,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)..\thirdparty\LibTEE\include;$(SolutionDir)..\common\include;$(SolutionDir)..\teetransport\transport\socket;$(SolutionDir)..\teetransport\transport\socket\lib;$(SolutionDir)..\teetransport\transport\libtee;$(SolutionDir)..\teetransport\transport\libtee\lib;$(SolutionDir)..\teetransport</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -736,6 +742,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WINDOWS_7_SUPPORT;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)..\thirdparty\LibTEE\include;$(SolutionDir)..\common\include;$(SolutionDir)..\teetransport\transport\socket;$(SolutionDir)..\teetransport\transport\socket\lib;$(SolutionDir)..\teetransport\transport\libtee;$(SolutionDir)..\teetransport\transport\libtee\lib;$(SolutionDir)..\teetransport</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -765,6 +772,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)..\thirdparty\LibTEE\include;$(SolutionDir)..\common\include;$(SolutionDir)..\teetransport\transport\socket;$(SolutionDir)..\teetransport\transport\socket\lib;$(SolutionDir)..\teetransport\transport\libtee;$(SolutionDir)..\teetransport\transport\libtee\lib;$(SolutionDir)..\teetransport</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

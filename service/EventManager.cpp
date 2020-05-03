@@ -384,7 +384,7 @@ namespace intel_dal
 				status = Applets.getAppletBlobs(spoolerFile, spoolerBlobs, isAcp); // in CSE we need the blobs for the create session API
 				if (status != JHI_SUCCESS)
 				{
-					TRACE0("Failed getting applet blobs from dalp file\n");
+					TRACE0("Failed to get spooler applet blobs.\n");
 					break;
 				}
 

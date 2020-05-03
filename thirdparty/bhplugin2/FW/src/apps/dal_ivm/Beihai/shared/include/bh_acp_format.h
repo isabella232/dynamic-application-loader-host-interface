@@ -69,6 +69,11 @@
 #define BH_MAX_ACP_PORPS_LENGTH 2048
 #define BH_MAX_ACP_NTA_METADATA_LENGTH 5120
 
+enum BH_SIG_VERSION {
+	BH_SIG_VERSION_1 = 1,
+	BH_SIG_VERSION_2 = 2
+};
+
 enum AC_CMD_ID {
     AC_CMD_INVALID,
     AC_INSTALL_SD,
@@ -184,8 +189,6 @@ typedef struct {
 //it should match the key type with BeihaiHAL.h
 enum SIG_KEY_TYPE {UNKNOWN = 0, INTEL_PLATFORM_KEY, DAL_KEY_1, INTEL_KEY_Manifest_V1, OEM_DAL_KEY, AC_SIG_KEY_OTHER};
 
-#define AC_SIG_KEY_LEN 260
-
 #pragma pack(1)
 
 typedef struct {
@@ -194,7 +197,7 @@ typedef struct {
     /*sig_data covers sig_key and sig_manifest,
       parser of signature should be reponsible to extract them
       according to sig_alg and sig_key_type*/
-    BH_I8 sig_key[AC_SIG_KEY_LEN];
+    BH_I8 sig_key[0];
 } ACInsSDSigKey;
 
 /*
@@ -223,7 +226,7 @@ typedef struct {
     BH_U32 ta_svn;
     BH_U8 hash_alg_type;
     BH_U8 ta_reserved[3];
-    BH_PACK_HASH hash;
+	BH_U8 pack_hash[0];
 } ACInsTAHeader; /*header struct shared between JTA and NTA*/
 
 typedef ACInsTAHeader ACInsNTAHeader;

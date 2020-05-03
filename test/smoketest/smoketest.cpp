@@ -386,7 +386,7 @@ string getEchoUuid(int num)
 int AppPropertyCall(
         JHI_HANDLE hJOM,
         const FILECHAR *AppProperty,
-        UINT8 rxBuffer[APP_PROPERTY_BUFFER_SIZE],
+		FILECHAR rxBuffer[APP_PROPERTY_BUFFER_SIZE],
         JVM_COMM_BUFFER* txrx
 )
 {
@@ -1076,7 +1076,7 @@ void test_04_max_sessions(JHI_HANDLE hJOM)
 
 void test_05_get_applet_property(JHI_HANDLE hJOM)
 {
-    UINT8 rxBuffer[APP_PROPERTY_BUFFER_SIZE] = {0x0};
+	FILECHAR rxBuffer[APP_PROPERTY_BUFFER_SIZE] = {0x0};
 
     int ispass = 1;
     FILECHAR szCurDir [LEN_DIR];
@@ -1147,7 +1147,7 @@ void test_05_get_applet_property(JHI_HANDLE hJOM)
 
 
         // try to send valid applet property with a short buffer
-        memset(rxBuffer, 0, APP_PROPERTY_BUFFER_SIZE);
+        memset(rxBuffer, 0, sizeof(rxBuffer));
         txrx.TxBuf->length = (uint32_t)FILECHARLEN(AppProperty_Name);
         txrx.TxBuf->buffer = const_cast<FILECHAR *>(AppProperty_Name);
         txrx.RxBuf->length = 0;
@@ -1243,7 +1243,7 @@ void test_06_max_installed_applets(JHI_HANDLE hJOM)
 
 	fprintf( stdout, "FW major version is %d, max applets limit is %d, max sessions limit is %d.\n", version.Major, maxAppletsCount, maxSessionsCount);
     
-    //installing the event service TA
+    //installing the event service TA. We don't use only echo applets in order to have the ability to run all tests (including the events test) without reburning.
     fprintf( stdout, "JHI installing the event service TA...");
     GetFullFilename(szCurDir, EVENT_SERVICE_FILENAME);
 
@@ -1256,7 +1256,7 @@ void test_06_max_installed_applets(JHI_HANDLE hJOM)
     fprintf( stdout, " succeeded\n");
 
     // Install max TAs & create max sessions
-    for (int i = 1; i <= maxAppletsCount; ++i)
+    for (int i = 1; i < maxAppletsCount; ++i)
     {
         GetFullFilename(szCurDir, getEchoFileName(i).c_str());
 
@@ -1290,13 +1290,13 @@ void test_06_max_installed_applets(JHI_HANDLE hJOM)
     }
 
     // now install the last echo applet in JOM after reachind the maximum. should fail.
-    GetFullFilename(szCurDir, getEchoFileName(maxAppletsCount + 1).c_str());
+    GetFullFilename(szCurDir, getEchoFileName(maxAppletsCount).c_str());
     fprintf( stdout, "\nNow install the last echo applet in JOM after reachind the maximum. should fail.\n");
 
-    status = JHI_Install2( hJOM, getEchoUuid(maxAppletsCount + 1).c_str(), szCurDir) ;
+    status = JHI_Install2( hJOM, getEchoUuid(maxAppletsCount).c_str(), szCurDir) ;
     if (status != JHI_MAX_INSTALLED_APPLETS_REACHED)
     {
-        fprintf( stdout, "JHI install echo%d did not return the correct return code\nReceived 0x%x (%s), expected JHI_MAX_INSTALLED_APPLETS_REACHED\n", maxAppletsCount + 1, status, JHIErrorToString(status));
+        fprintf( stdout, "JHI install echo%d did not return the correct return code\nReceived 0x%x (%s), expected JHI_MAX_INSTALLED_APPLETS_REACHED\n", maxAppletsCount, status, JHIErrorToString(status));
         exit_test(EXIT_FAILURE);
     }
     fprintf( stdout, "Install failed as expected.\n\n");
@@ -1304,7 +1304,7 @@ void test_06_max_installed_applets(JHI_HANDLE hJOM)
     status = JHI_SUCCESS;
 
     // Close sessions & uninstall the echo applets
-    for (int i = 1; i <= maxAppletsCount; ++i)
+    for (int i = 1; i < maxAppletsCount; ++i)
     {
         if (i <= maxSessionsCount) //close only until max sessions reached.
         {
@@ -1339,7 +1339,7 @@ void test_06_max_installed_applets(JHI_HANDLE hJOM)
 
     //try to uninstall the last applet, should fail.
     fprintf( stdout, "\nTry to uninstall the last applet, should fail.\n");
-    status = JHI_Uninstall (hJOM, (char*)getEchoUuid(maxAppletsCount + 1).c_str());
+    status = JHI_Uninstall (hJOM, (char*)getEchoUuid(maxAppletsCount).c_str());
     if (status == JHI_SUCCESS)
     {
         fprintf( stdout, "JHI uninstall echo applet6 succeded when should have failed\n") ;
@@ -1972,7 +1972,7 @@ void test_13_negative_test_send_and_recieve(JHI_HANDLE hJOM)
 
 void test_14_negative_test_get_applet_property(JHI_HANDLE hJOM)
 {
-    UINT8   rxBuffer[APP_PROPERTY_BUFFER_SIZE] = {0x0};
+	FILECHAR rxBuffer[APP_PROPERTY_BUFFER_SIZE] = {0x0};
     FILECHAR szCurDir [LEN_DIR];
     JVM_COMM_BUFFER txrx ;
     JHI_RET status;
@@ -2006,7 +2006,7 @@ void test_14_negative_test_get_applet_property(JHI_HANDLE hJOM)
     fprintf( stdout, "Received JHI_APPLET_PROPERTY_NOT_SUPPORTED as expected.\n");
 
     // try to send valid applet property with a short buffer
-    memset(rxBuffer,0,APP_PROPERTY_BUFFER_SIZE);
+    memset(rxBuffer,0,sizeof(rxBuffer));
     txrx.TxBuf->length = (uint32_t)FILECHARLEN(AppProperty_Name);
     txrx.TxBuf->buffer = const_cast<FILECHAR *>(AppProperty_Name);
     txrx.RxBuf->length = 0;
@@ -2323,6 +2323,7 @@ void test_18_admin_install_uninstall()
 {
 	TEE_STATUS teeStatus;
 	SD_SESSION_HANDLE sdSession;
+	dal_tee_metadata teeMetadata;
 	FILECHAR echoInstallAcp [LEN_DIR];
 	FILECHAR echoUninstallAcp [LEN_DIR];
 	vector<uint8_t> installBlob, uninstallBlob;
@@ -2350,9 +2351,25 @@ void test_18_admin_install_uninstall()
 		exit_test(EXIT_FAILURE);
 	}
 
+	//get the signature version in order to install the right acp file.
+	teeStatus = TEE_QueryTEEMetadata(sdSession, &teeMetadata);
+	if (teeStatus != TEE_STATUS_SUCCESS)
+	{
+		fprintf(stdout, "TEE_QueryTEEMetadata failed, error code: 0x%x (%s)\n", teeStatus, TEEErrorToString(teeStatus));
+		exit_test(EXIT_FAILURE);
+	}
+
+	TCHAR* echoAcpInstallFilename = ECHO_ACP_INSTALL_SIG_VER_1_FILENAME;
+	TCHAR* echoAcpUninstallFilename = ECHO_ACP_UNINSTALL_SIG_VER_1_FILENAME;
+	if (teeMetadata.sig_version == SIG_VERSION_3K_APPLET_SIGNING)
+	{
+		echoAcpInstallFilename = ECHO_ACP_INSTALL_SIG_VER_2_FILENAME;
+		echoAcpUninstallFilename = ECHO_ACP_UNINSTALL_SIG_VER_2_FILENAME;
+	}
+
 	//set the full paths
-	GetFullFilename(echoInstallAcp, ECHO_ACP_INSTALL_FILENAME);
-	GetFullFilename(echoUninstallAcp, ECHO_ACP_UNINSTALL_FILENAME);
+	GetFullFilename(echoInstallAcp, (const TCHAR*) echoAcpInstallFilename);
+	GetFullFilename(echoUninstallAcp, (const TCHAR*) echoAcpUninstallFilename);
 
 	//reading the ACPs into the blobs.
 	teeStatus = readFileAsBlob(echoInstallAcp, installBlob);
@@ -2392,6 +2409,7 @@ void test_19_admin_install_with_session(JHI_HANDLE hJOM)
     JHI_SESSION_HANDLE hSession;
     JHI_RET jhiStatus;
     TEE_STATUS teeStatus;
+	dal_tee_metadata teeMetadata;
     UINT32 session_count;
     JHI_SESSION_INFO info;
     FILECHAR szCurDir [LEN_DIR];
@@ -2429,8 +2447,20 @@ void test_19_admin_install_with_session(JHI_HANDLE hJOM)
         exit_test(EXIT_FAILURE);
     }
 
+	//get the signature version in order to install the right acp file.
+	teeStatus = TEE_QueryTEEMetadata(sdSession, &teeMetadata);
+	if (teeStatus != TEE_STATUS_SUCCESS)
+	{
+		fprintf(stdout, "TEE_QueryTEEMetadata failed, error code: 0x%x (%s)\n", teeStatus, TEEErrorToString(teeStatus));
+		exit_test(EXIT_FAILURE);
+	}
+
+	TCHAR* echoAcpInstallFilename = ECHO_ACP_INSTALL_SIG_VER_1_FILENAME;
+	if (teeMetadata.sig_version == SIG_VERSION_3K_APPLET_SIGNING)
+		echoAcpInstallFilename = ECHO_ACP_INSTALL_SIG_VER_2_FILENAME;
+
     // now install the echo_1 applet in JOM
-    GetFullFilename(szCurDir, ECHO_ACP_INSTALL_FILENAME);
+    GetFullFilename(szCurDir, (const TCHAR*) echoAcpInstallFilename);
 
     jhiStatus = readFileAsBlob(szCurDir, blob);
     if (jhiStatus != JHI_SUCCESS)
@@ -2514,6 +2544,7 @@ void test_20_admin_updatesvl()
 {
 	TEE_STATUS teeStatus;
 	SD_SESSION_HANDLE sdSession;
+	dal_tee_metadata teeMetadata;
 	FILECHAR echoUpdatesvlAcp[LEN_DIR];
 	vector<uint8_t> updatesvlBlob;
 	const char *intelSD = INTEL_SD_UUID;
@@ -2540,8 +2571,20 @@ void test_20_admin_updatesvl()
 		exit_test(EXIT_FAILURE);
 	}
 
+	//get the signature version in order to use the right acp file.
+	teeStatus = TEE_QueryTEEMetadata(sdSession, &teeMetadata);
+	if (teeStatus != TEE_STATUS_SUCCESS)
+	{
+		fprintf(stdout, "TEE_QueryTEEMetadata failed, error code: 0x%x (%s)\n", teeStatus, TEEErrorToString(teeStatus));
+		exit_test(EXIT_FAILURE);
+	}
+
+	TCHAR* echoAcpUpdateSvlFilename = ECHO_ACP_UPDATESVL_SIG_VER_1_FILENAME;
+	if (teeMetadata.sig_version == SIG_VERSION_3K_APPLET_SIGNING)
+		echoAcpUpdateSvlFilename = ECHO_ACP_UPDATESVL_SIG_VER_2_FILENAME;
+
 	//set the full paths
-	GetFullFilename(echoUpdatesvlAcp, ECHO_ACP_UPDATESVL_FILENAME);
+	GetFullFilename(echoUpdatesvlAcp, (const TCHAR*) echoAcpUpdateSvlFilename);
 
 	//reading the ACP into the blobs.
 	teeStatus = readFileAsBlob(echoUpdatesvlAcp, updatesvlBlob);
@@ -2793,7 +2836,7 @@ void test_23_applet_encryption(JHI_HANDLE hJOM)
 	GetFullFilename(installSdAcp, ACP_INSTALL_SD_FILENAME);
 	GetFullFilename(uninstallSdAcp, ACP_UNINSTALL_SD_FILENAME);
 	GetFullFilename(installAppletAcp, ECHO_ENCRYPTED_FILENAME);
-	GetFullFilename(uninstallAppletAcp, ECHO_ACP_UNINSTALL_FILENAME);
+	GetFullFilename(uninstallAppletAcp, ECHO_ACP_UNINSTALL_SIG_VER_1_FILENAME); // applet encryption is only supported in small core, with 2K applet signing.
 
 	// Read ACPs into blobs
 	cout << "Reading applet blobs..." << endl;

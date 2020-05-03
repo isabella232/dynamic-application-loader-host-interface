@@ -67,7 +67,7 @@ namespace Jhi_Plugin_2
 		UINT32 JHI_Plugin_GetPluginType();
 
 		UINT32 JHI_Plugin_DownloadApplet (const char *pAppId, uint8_t* pAppBlob, unsigned int BlobSize);
-		UINT32 JHI_Plugin_UnloadApplet (const char *AppId );
+		UINT32 JHI_Plugin_UnloadApplet (const char *AppId, int sigVersion );
 
 		UINT32 JHI_Plugin_GetAppletProperty (const char *AppId, JVM_COMM_BUFFER *pIOBuffer);
 
@@ -108,13 +108,13 @@ namespace Jhi_Plugin_2
 		static TEE_TRANSPORT_INTERFACE  transport_interface;
 
 		//internal functions
-		void uninstallAll();
+		void uninstallAll(int sigVersion);
 		BH_RET openIntelSD();
 		BH_RET closeIntelSD();
 		unsigned int getTotalSessionsCount();
 		int sendSessionIDtoApplet(VM_SESSION_HANDLE* pSession, JHI_SESSION_ID SessionID, int* appletResponse);
 		bool convertAppProperty_Version(char** output);
-		void setUninstallPack(const char *pAppId, char** uninstallPkg);
+		void setUninstallPack(const char *pAppId, int sigVersion, char** uninstallPkg, int* uninstallPkgLen);
 		bool isTAinstalled(const char *pAppId);
 		UINT32 getTA_SessionCount(const char *pAppId);
 

@@ -63,7 +63,10 @@ namespace intel_dal
 	private:
 
 		//constant representing FW which supports sign once.
-		static const int SIGN_ONCE_FW__MAJOR_VERSION = 11;
+		static const int SIGN_ONCE_2K_KEY_DALP_VERSION = 11;
+		static const int SIGN_ONCE_3K_KEY_DALP_VERSION = 15;
+		static const int SIGNING_VERSION_2K_KEY = 1;
+		static const int SIGNING_VERSION_3K_KEY = 2;
 		static const int INVALID_API_LEVEL = -1;
 
 		//constant representing an invalid platform name ( initialized in the .cpp file ).
@@ -98,7 +101,7 @@ namespace intel_dal
 		/*
 		get all applet blobs that support sign once.
 		*/
-		bool getSignOnceAppletBlobs(const string& fwVersion, list<vector<uint8_t> >& blobsList);
+		bool getSignOnceAppletBlobs(list<vector<uint8_t> >& blobsList);
 
 		/*
 		return a list of applets that match the given majorFwVersion
@@ -114,11 +117,12 @@ namespace intel_dal
 		return a string representing the platform's name, i.e ME, CSE..
 		*/
 		string getPlatformName();
+		
 
 		/*
-		return supported API level on platform ( using query tee meta data ).
+		return the dalp signing version (11/ 15) according to platform signature version.
 		*/
-		int getPlatformApiLevel();
+		int getSignOnceDalpSigningVersion();
 
 		/*
 		copy the blobs in sorted order to the output list.

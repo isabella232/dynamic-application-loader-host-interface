@@ -407,6 +407,8 @@ JHI_Uninstall(
 
 //------------------------------------------------------------
 // Function: JHI_GetAppletProperty
+// Note: Both TX and RX buffers should be FILECHAR buffers.
+//       The buffers length should be the number of characters (not necessarily size in bytes)
 //------------------------------------------------------------
 JHI_EXPORT 
 JHI_GetAppletProperty(

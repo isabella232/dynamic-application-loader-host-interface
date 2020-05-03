@@ -113,7 +113,7 @@ bool TryUnloadUnusedApplet()
 // Function: jhis_install
 //		    Used to download an applet into JoM
 // IN	  : pAppId - incoming AppId of package 
-// IN     : pTFile - path of pack file to be installed
+// IN     : pFile - path of pack file to be installed
 // IN     : visibleApp - determines whether to keep record of the app.
 // RETURN : JHI_RET - success or any failure returns
 //-------------------------------------------------------------------------------
@@ -164,7 +164,7 @@ JHI_RET_I
 	AppletsManager&  Applets = AppletsManager::Instance();
 	JHI_VM_TYPE vmType = GlobalsManager::Instance().getVmType();
 
-	TRACE2("Attempting to install - applet ID: %s\nPath: %s", pAppId, pFile);
+	TRACE2("Attempting to install - applet ID: %s. Path: %s", pAppId, pFile);
 
 	// try to perform sessions cleanup in order to avoid failure cause by abandoned session
 	Sessions.ClearSessionsDeadOwners();
@@ -220,7 +220,7 @@ JHI_RET_I
 		ulRetCode = Applets.getAppletBlobs(pFile, appletBlobs, isAcp);
 		if (ulRetCode != JHI_SUCCESS)
 		{
-			TRACE0("failed getting applet blobs from dalp file\n");
+			TRACE0("jhis_install(): Failed to get applet blobs from dalp file.\n");
 			goto cleanup;
 		}
 	}
@@ -233,7 +233,7 @@ JHI_RET_I
 		if (JHI_FILE_IDENTICAL == ulRetCode) // the applet version is already exists in the VM
 		{
 			// Force re-install:
-			plugin->JHI_Plugin_UnloadApplet(pAppId);
+			plugin->JHI_Plugin_UnloadApplet(pAppId, GlobalsManager::Instance().getSigVersion());
 			ulRetCode = plugin->JHI_Plugin_DownloadApplet(pAppId, &(*it)[0], (unsigned int)(*it).size() );
 			break;
 		}
@@ -290,7 +290,7 @@ JHI_RET_I
 errorDeleteFromFW:
 
 	//call the delete function using the plugin
-	plugin->JHI_Plugin_UnloadApplet(pAppId);
+	plugin->JHI_Plugin_UnloadApplet(pAppId, GlobalsManager::Instance().getSigVersion());
 
 errorRemoveApplet:
 

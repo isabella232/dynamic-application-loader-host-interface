@@ -49,11 +49,7 @@ typedef long long BH_I64;
 typedef unsigned long long BH_U64;
 typedef BH_U64 BH_GROUP;
 #define BH_GUID_LENGTH 16
-#define BH_MAX_PACK_HASH_LEN 32
-
-typedef struct {
-    BH_U8 data[BH_MAX_PACK_HASH_LEN];
-} BH_PACK_HASH;
+#define BH_MAX_PACK_HASH_LEN 48
 
 typedef struct {
     BH_U8 data[BH_GUID_LENGTH];

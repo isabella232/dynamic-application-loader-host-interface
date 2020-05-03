@@ -941,7 +941,7 @@ error:
 		/** Copying all the data to the outputbuffer **/			
 		for (UINT32 i = 0; i < res_data.loadedApplets.loadedAppletsCount; ++i)
 		{
-			memcpy_s((uint8_t*)outputGUIDs + i*(LEN_APP_ID + 1), LEN_APP_ID + 1, res_data.loadedApplets.appsGUIDs[i], LEN_APP_ID + 1);
+			memmove_s((uint8_t*)outputGUIDs + i*(LEN_APP_ID + 1), LEN_APP_ID + 1, res_data.loadedApplets.appsGUIDs[i], LEN_APP_ID + 1);
 		}
 
 		*((JHI_RES_GET_LOADED_APPLETS*)((*((JHI_RESPONSE*)(*outputData))).data)) = tmp;
@@ -1031,7 +1031,7 @@ error:
 		if (event_data.data != NULL)
 		{
 			uint8_t* pBufferData = (*((JHI_RES_GET_EVENT_DATA*)((*((JHI_RESPONSE*)(*outputData))).data))).data;
-			memcpy_s(pBufferData,event_data.datalen,event_data.data,event_data.datalen);
+			memmove_s(pBufferData,event_data.datalen,event_data.data,event_data.datalen);
 
 			JHI_DEALLOC(event_data.data);
 			event_data.data = NULL;
@@ -1150,7 +1150,7 @@ error:
 			    res_data.RecvBuffer_size <= cmd_data->RecvBuffer_size)
 			{
 				uint8_t* pBufferData = (*((JHI_RES_SEND_AND_RECIEVE*)((*((JHI_RESPONSE*)(*outputData))).data))).data;
-				memcpy_s(pBufferData,res_data.RecvBuffer_size,IOBuffer.RxBuf->buffer,res_data.RecvBuffer_size);
+				memmove_s(pBufferData,res_data.RecvBuffer_size,IOBuffer.RxBuf->buffer,res_data.RecvBuffer_size);
 			}
 		}
 
@@ -1301,7 +1301,7 @@ error:
 			    res_data.RecvBuffer_size <= cmd_data->RecvBuffer_size)
 			{
 				uint8_t* pBufferData = (*((JHI_RES_GET_APPLET_PROPERTY*)((*((JHI_RESPONSE*)(*outputData))).data))).data;
-				memcpy_s(pBufferData,res_data.RecvBuffer_size,IOBuffer.RxBuf->buffer,res_data.RecvBuffer_size);
+				memmove_s(pBufferData,res_data.RecvBuffer_size,IOBuffer.RxBuf->buffer,res_data.RecvBuffer_size);
 			}
 		}
 
@@ -1607,7 +1607,7 @@ error:
 		{
 			// Build the output buffer.
 			// The buffer containg all the UUIDs (including their null termination) concatenated one after the other.
-			memcpy_s(jhiOutputData->data, sizeof(res_data), &res_data, sizeof(res_data)); // copy internal struct.
+			memmove_s(jhiOutputData->data, sizeof(res_data), &res_data, sizeof(res_data)); // copy internal struct.
 
 			if (res.retCode == TEE_STATUS_SUCCESS && res_data.count > 0)
 			{
@@ -1699,7 +1699,7 @@ error:
 		{
 			// Build the output buffer.
 			// The buffer containg all the UUIDs (including their null termination) concatenated one after the other.
-			memcpy_s(jhiOutputData->data, sizeof(res_data), &res_data, sizeof(res_data)); // copy internal struct.
+			memmove_s(jhiOutputData->data, sizeof(res_data), &res_data, sizeof(res_data)); // copy internal struct.
 
 			if (res.retCode == TEE_STATUS_SUCCESS && res_data.count > 0)
 			{
@@ -1763,7 +1763,7 @@ error:
 		if (res.retCode == JHI_SUCCESS)
 		{
 			infoPtr = (JHI_VERSION_INFO*) (*((JHI_RESPONSE*)(*outputData))).data;
-			memcpy_s(infoPtr,sizeof(JHI_VERSION_INFO),&info,sizeof(JHI_VERSION_INFO));
+			memmove_s(infoPtr,sizeof(JHI_VERSION_INFO),&info,sizeof(JHI_VERSION_INFO));
 		}
 
 		*outputSize = res.dataLength;
@@ -1840,9 +1840,9 @@ error:
 
 		if (res.retCode == TEE_STATUS_SUCCESS)
 		{
-			memcpy_s(jhiOutputData->data, sizeof(res_data), &res_data, sizeof(res_data)); // copy internal struct.
+			memmove_s(jhiOutputData->data, sizeof(res_data), &res_data, sizeof(res_data)); // copy internal struct.
 			char* pBufferData = (char*)((JHI_RES_QUERY_TEE_METADATA*)(jhiOutputData->data))->metadata; //set pointer to the internal data in the struct.
-			memcpy_s(pBufferData, res_data.length, metadata, res_data.length);
+			memmove_s(pBufferData, res_data.length, metadata, res_data.length);
 			JHI_DEALLOC(metadata);
 		}
 		*outputSize = res.dataLength;
