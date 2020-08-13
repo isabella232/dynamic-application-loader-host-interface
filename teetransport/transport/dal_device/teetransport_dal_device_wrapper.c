@@ -164,9 +164,8 @@ TEE_COMM_STATUS DAL_Device_Disconnect(IN TEE_TRANSPORT_INTERFACE_PTR pInterface,
     }    	
 
 	return TEE_COMM_SUCCESS;
-}
-
 #endif
+}
 
 TEE_COMM_STATUS DAL_Device_Send(IN TEE_TRANSPORT_INTERFACE_PTR pInterface, IN TEE_TRANSPORT_HANDLE handle, IN const uint8_t* buffer, IN uint32_t length)
 {

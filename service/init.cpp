@@ -102,7 +102,7 @@ JHI_RET_I
 
 	// Verify that the applet repository folder exists. If it doesn't, on Windows, attempt to create it.
 #ifdef _WIN32
-	if (_waccess_s(appletsFileLocation, 0) != 0 && std::tr2::sys::create_directories(appletsFileLocation, throwaway) == 0)
+	if (_waccess_s(appletsFileLocation, 0) != 0 && std::filesystem::create_directories(appletsFileLocation, throwaway) == 0)
 #else
 	if (_waccess_s(appletsFileLocation,0) != 0)
 #endif

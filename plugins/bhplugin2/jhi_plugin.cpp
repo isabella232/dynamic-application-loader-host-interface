@@ -1013,7 +1013,7 @@ end:
 			majorStreamSTR >> majorUINT;
 			minorStreamSTR >> minorUINT;
 
-			if ( (majorUINT > 255) || (minorUINT > 255) )
+			if (majorStreamSTR.fail() || majorUINT > 255 || minorStreamSTR.fail() || minorUINT > 255 )
 			{
 				return false;	// not valid
 			}

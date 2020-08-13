@@ -35,9 +35,9 @@ extern "C" {
 
 // Version format: Major.Minor.Year.MonthDay
 #define JHI_VER_MAJOR    1
-#define JHI_VER_MINOR    37
+#define JHI_VER_MINOR    38
 #define JHI_VER_YEAR     2020
-#define JHI_VER_MONTHDAY 0426
+#define JHI_VER_MONTHDAY 0805
 
 
 #define JHI_VERSION MAKE_VER_STRING(JHI_VER_MAJOR, JHI_VER_MINOR, JHI_VER_YEAR, JHI_VER_MONTHDAY)

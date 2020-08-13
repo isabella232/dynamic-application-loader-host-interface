@@ -187,8 +187,15 @@ typedef  PVOID   JHI_SESSION_HANDLE;
 // This applies for all JHI API function that use buffers such as: 
 // SendAndRecieve, CreateSession, GetAppletProperty.
 // -----------------------------------------------------------
-#define JHI_BUFFER_MAX 2097152	 
+#define JHI_BUFFER_MAX 2097152
 
+
+// -----------------------------------------------------------
+// ACP size limitation in FW is 1MB
+// JHI will not accept ACPs with greater size.
+// This applies for SendAdminCmdPkg
+// -----------------------------------------------------------
+#define JHI_ACP_SIZE_MAX 1048576
 
 //------------------------------------------------------------
 // Applet version macros

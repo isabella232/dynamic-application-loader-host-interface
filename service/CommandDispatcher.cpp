@@ -1503,6 +1503,12 @@ error:
 				res.retCode = TEE_STATUS_INTERNAL_ERROR;
 				break;
 			}
+			
+			if (cmdPkg->blobSize > JHI_ACP_SIZE_MAX)
+			{
+				res.retCode = TEE_STATUS_INVALID_PACKAGE;
+				break;
+			}
 
 			if (inputSize != sizeof(JHI_COMMAND) -1 + sizeof(JHI_CMD_SEND_CMD_PKG) -1 + cmdPkg->blobSize)
 			{

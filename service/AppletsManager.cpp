@@ -438,7 +438,7 @@ namespace intel_dal
 
 	JHI_APPLET_STATUS AppletsManager::getAppletState(const string& appletId)
 	{
-		JHI_APPLET_STATUS status;
+		JHI_APPLET_STATUS status = MAX_APP_STATES;
 
 		_locker.Lock();
 

@@ -162,7 +162,7 @@ jhis_create_session(
 		**  Non shared session is requested, or a shared session is requested but none for the applet exists yet.
 		**  Create a new session
 		*/
-		VM_SESSION_HANDLE VMSessionHandle;
+		VM_SESSION_HANDLE VMSessionHandle = NULL;
 		JHI_SESSION_ID newSessionID;
 
 		if (!Sessions.generateNewSessionId(&newSessionID))
