@@ -201,47 +201,53 @@ namespace Intel.Dal
             JhiMainCallback = this.CallbackFunc;
         }
 
+        
         private string getJhiDllPath()
         {
             string jhiPath = "";
             bool is64BitProcess = (IntPtr.Size == 8); // in 64 bit applications, process address size is 8 byte
-
+            string dllName = "jhi.dll";
+            string jhiLegacyRegPath = @"SOFTWARE\Intel\Services\DAL";
+            string jhiUniversalRegPath = @"SYSTEM\CurrentControlSet\Services\jhi_service\Parameters";
 
             if (is64BitProcess)
-            {
-                // in 64 bit OS and application. we need to read the Program files location
-                // that contains jhi64.dll
-                string ProgramsDir = Environment.GetEnvironmentVariable("ProgramW6432");
-                
-                jhiPath = System.IO.Path.Combine(ProgramsDir, @"Intel\Intel(R) Management Engine Components\DAL\jhi64.dll");
-            }
-            else
-            {
-                // jhi installation path can vary according to the MEI installer, therefore we have to 
-                // retrieve the installation folder from the registry in order to get the location of jhi.dll
+                // if the process is 64 bit - need to load jhi64.dll
+                dllName = "jhi64.dll";
 
-                UIntPtr LOCAL_MACHINE = new UIntPtr(0x80000002u);
-                int KEY_READ = 0x20019;
-                int KEY_WOW64_64KEY = 0x0100;
-                UIntPtr handle;
-                uint varaiableType = 0; // REG_SZ
-                int size = (260-1)*2; // (FILENAME_MAX-1) * sizeof(w_char)
-                System.Text.StringBuilder keyBuffer = new System.Text.StringBuilder(size);
+            // jhi installation path can vary according to the MEI installer, therefore we have to 
+            // retrieve the installation folder from the registry in order to get the location of jhi.dll
+            // This code is running c++ functions direcly since we could not read the KEY_WOW64_64KEY registry from 32 bit process using c# functions only.
 
-                if (JhiWrapper.RegOpenKeyEx(LOCAL_MACHINE, @"SOFTWARE\Intel\Services\DAL", 0, KEY_READ | KEY_WOW64_64KEY, out handle) == 0)
+            UIntPtr LOCAL_MACHINE = new UIntPtr(0x80000002u);
+            int KEY_READ = 0x20019;
+            int KEY_WOW64_64KEY = 0x0100;
+            UIntPtr handle;
+            uint varaiableType = 0; // REG_SZ
+            int size = (260 - 1) * 2; // (FILENAME_MAX-1) * sizeof(w_char)
+            System.Text.StringBuilder keyBuffer = new System.Text.StringBuilder(size);
+
+            // Read JHI location from registry
+            if (JhiWrapper.RegOpenKeyEx(LOCAL_MACHINE, jhiLegacyRegPath, 0, KEY_READ | KEY_WOW64_64KEY, out handle) == 0 || // Legacy JHI
+                JhiWrapper.RegOpenKeyEx(LOCAL_MACHINE, jhiUniversalRegPath, 0, KEY_READ | KEY_WOW64_64KEY, out handle) == 0) // Universal JHI
+            {
+                if (JhiWrapper.RegQueryValueEx(handle, "FILELOCALE", 0, ref varaiableType, keyBuffer, ref size) == 0)
                 {
-                    if (JhiWrapper.RegQueryValueEx(handle, "FILELOCALE", 0, ref varaiableType, keyBuffer, ref size) == 0)
-                    {
-                        jhiPath = System.IO.Path.Combine(keyBuffer.ToString(),"Jhi.dll");
-                    }
-
-                    // close the registry handle
-                    JhiWrapper.RegCloseKey(handle);
+                    jhiPath = keyBuffer.ToString();
+                    if (is64BitProcess)
+                        // In Legacy JHI, the path to jhi64.dll is in Program Files and not in Program Files (x86).
+                        // In Universal - will do nothing since the path does not contain "Program Files"
+                        jhiPath = jhiPath.Replace("Program Files (x86)", "Program Files");
                 }
 
+                // close the registry handle
+                JhiWrapper.RegCloseKey(handle);
             }
+            else
+                return dllName;
 
-            return jhiPath;
+            jhiPath = System.IO.Path.Combine(jhiPath, dllName);
+
+            return Environment.ExpandEnvironmentVariables(jhiPath);
         }
         
         /// <summary>

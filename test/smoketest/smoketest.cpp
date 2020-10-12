@@ -2359,8 +2359,8 @@ void test_18_admin_install_uninstall()
 		exit_test(EXIT_FAILURE);
 	}
 
-	TCHAR* echoAcpInstallFilename = ECHO_ACP_INSTALL_SIG_VER_1_FILENAME;
-	TCHAR* echoAcpUninstallFilename = ECHO_ACP_UNINSTALL_SIG_VER_1_FILENAME;
+	const TCHAR* echoAcpInstallFilename = ECHO_ACP_INSTALL_SIG_VER_1_FILENAME;
+	const TCHAR* echoAcpUninstallFilename = ECHO_ACP_UNINSTALL_SIG_VER_1_FILENAME;
 	if (teeMetadata.sig_version == SIG_VERSION_3K_APPLET_SIGNING)
 	{
 		echoAcpInstallFilename = ECHO_ACP_INSTALL_SIG_VER_2_FILENAME;
@@ -2455,7 +2455,7 @@ void test_19_admin_install_with_session(JHI_HANDLE hJOM)
 		exit_test(EXIT_FAILURE);
 	}
 
-	TCHAR* echoAcpInstallFilename = ECHO_ACP_INSTALL_SIG_VER_1_FILENAME;
+	const TCHAR* echoAcpInstallFilename = ECHO_ACP_INSTALL_SIG_VER_1_FILENAME;
 	if (teeMetadata.sig_version == SIG_VERSION_3K_APPLET_SIGNING)
 		echoAcpInstallFilename = ECHO_ACP_INSTALL_SIG_VER_2_FILENAME;
 
@@ -2579,7 +2579,7 @@ void test_20_admin_updatesvl()
 		exit_test(EXIT_FAILURE);
 	}
 
-	TCHAR* echoAcpUpdateSvlFilename = ECHO_ACP_UPDATESVL_SIG_VER_1_FILENAME;
+	const TCHAR* echoAcpUpdateSvlFilename = ECHO_ACP_UPDATESVL_SIG_VER_1_FILENAME;
 	if (teeMetadata.sig_version == SIG_VERSION_3K_APPLET_SIGNING)
 		echoAcpUpdateSvlFilename = ECHO_ACP_UPDATESVL_SIG_VER_2_FILENAME;
 

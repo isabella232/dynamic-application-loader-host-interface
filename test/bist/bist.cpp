@@ -48,7 +48,7 @@ bool CheckTeeSuccess(JHI_RET status, string step)
 #define RX_LEN 8
 
 
-bool getAppletBlobAccordingToSigVer(dal_tee_metadata &teeMetadata, char** prod_app_blob, uint32_t* prod_app_len)
+bool getAppletBlobAccordingToSigVer(dal_tee_metadata &teeMetadata, const char** prod_app_blob, uint32_t* prod_app_len)
 {
 	switch (teeMetadata.sig_version)
 	{
@@ -83,7 +83,7 @@ int main()
     JVM_COMM_BUFFER comm_buffer;
 
 	dal_tee_metadata teeMetadata;
-	char* prod_app_blob = NULL;
+	const char* prod_app_blob = NULL;
 	uint32_t prod_app_len = 0;
 
     comm_buffer.TxBuf->length = TX_LEN;

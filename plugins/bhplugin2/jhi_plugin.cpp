@@ -231,7 +231,7 @@ end:
 		string appId = string(pAppId);
 		std::transform(appId.begin(), appId.end(), appId.begin(), ::toupper);
 
-		char* uninstallPack = UNINSTALL_PACK_SIG_VER_1;
+		const char* uninstallPack = UNINSTALL_PACK_SIG_VER_1;
 		*uninstallPkgLen = UNINSTALL_PACK_SIG_VER_1_LEN;
 		int dal_manifest_length = JHI_SIG_VER_1_MANIFEST_LENGTH;
 		if (sigVersion == SIG_VERSION_3K_APPLET_SIGNING)

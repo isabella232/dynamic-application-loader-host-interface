@@ -1,20 +1,27 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 /*
- * Copyright (C) 2014-2019 Intel Corporation
+ * Copyright (C) 2014-2020 Intel Corporation
  */
+#include <errno.h>
+#include <fcntl.h>
+#include <libmei.h>
+#include <linux/mei.h>
+#include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <fcntl.h>
 #include <sys/ioctl.h>
+#include <sys/select.h>
 #include <unistd.h>
-#include <errno.h>
-#include <stdint.h>
-#include <stdbool.h>
-#include <linux/mei.h>
+
 #include "metee.h"
 #include "helpers.h"
-#include <libmei.h>
+
+#define MAX_FW_STATUS_NUM 5
+
+#define MILISEC_IN_SEC 1000
+#define MICROSEC_IN_SEC 1000000
 
 /* use inline function instead of macro to avoid -Waddress warning in GCC */
 static inline struct mei *to_mei(PTEEHANDLE _h) __attribute__((always_inline));
@@ -29,8 +36,8 @@ static inline int __mei_select(struct mei *me, bool on_read, unsigned long timeo
 	fd_set rset, wset;
 	struct timeval tv;
 
-	tv.tv_sec =  timeout / 1000;
-	tv.tv_usec = (timeout % 1000) * 1000000;
+	tv.tv_sec =  timeout / MILISEC_IN_SEC;
+	tv.tv_usec = (timeout % MILISEC_IN_SEC) * MICROSEC_IN_SEC;
 
 	FD_ZERO(&rset);
 	FD_ZERO(&wset);
@@ -60,7 +67,7 @@ static inline TEESTATUS errno2status(int err)
 	}
 }
 
-TEESTATUS TEEAPI TeeInit(IN OUT PTEEHANDLE handle, IN const UUID *uuid, IN OPTIONAL const char *device)
+TEESTATUS TEEAPI TeeInit(IN OUT PTEEHANDLE handle, IN const GUID *guid, IN OPTIONAL const char *device)
 {
 	struct mei *me;
 	TEESTATUS  status;
@@ -72,14 +79,48 @@ TEESTATUS TEEAPI TeeInit(IN OUT PTEEHANDLE handle, IN const UUID *uuid, IN OPTIO
 
 	FUNC_ENTRY();
 
-	if (uuid == NULL || handle == NULL) {
+	if (guid == NULL || handle == NULL) {
 		ERRPRINT("One of the parameters was illegal");
 		status = TEE_INVALID_PARAMETER;
 		goto End;
 	}
 
 	__tee_init_handle(handle);
-	me = mei_alloc(device ? device : MEI_DEFAULT_DEVICE, uuid, 0, verbose);
+	me = mei_alloc(device ? device : MEI_DEFAULT_DEVICE, guid, 0, verbose);
+	if (!me) {
+		ERRPRINT("Cannot init mei structure\n");
+		status = TEE_INTERNAL_ERROR;
+		goto End;
+	}
+	handle->handle = me;
+	status = TEE_SUCCESS;
+
+End:
+	FUNC_EXIT(status);
+	return status;
+}
+
+TEESTATUS TEEAPI TeeInitHandle(IN OUT PTEEHANDLE handle, IN const GUID *guid,
+			       IN const TEE_DEVICE_HANDLE device_handle)
+{
+	struct mei *me;
+	TEESTATUS  status;
+#if defined(DEBUG) && !defined(SYSLOG)
+	bool verbose = true;
+#else
+	bool verbose = false;
+#endif // DEBUG and !SYSLOG
+
+	FUNC_ENTRY();
+
+	if (guid == NULL || handle == NULL) {
+		ERRPRINT("One of the parameters was illegal");
+		status = TEE_INVALID_PARAMETER;
+		goto End;
+	}
+
+	__tee_init_handle(handle);
+	me = mei_alloc_fd(device_handle, guid, 0, verbose);
 	if (!me) {
 		ERRPRINT("Cannot init mei structure\n");
 		status = TEE_INTERNAL_ERROR;
@@ -140,6 +181,12 @@ TEESTATUS TEEAPI TeeRead(IN PTEEHANDLE handle, IN OUT void *buffer, IN size_t bu
 		goto End;
 	}
 
+	if (me->state != MEI_CL_STATE_CONNECTED) {
+		ERRPRINT("The client is not connected\n");
+		status = TEE_DISCONNECTED;
+		goto End;
+	}
+
 	DBGPRINT("call read length = %zd\n", bufferSize);
 
 	if (timeout && (rc = __mei_select(me, true, timeout))) {
@@ -182,6 +229,12 @@ TEESTATUS TEEAPI TeeWrite(IN PTEEHANDLE handle, IN const void *buffer, IN size_t
 		goto End;
 	}
 
+	if (me->state != MEI_CL_STATE_CONNECTED) {
+		ERRPRINT("The client is not connected\n");
+		status = TEE_DISCONNECTED;
+		goto End;
+	}
+
 	DBGPRINT("call write length = %zd\n", bufferSize);
 
 	if (timeout && (rc = __mei_select(me, false, timeout))) {
@@ -202,6 +255,42 @@ TEESTATUS TEEAPI TeeWrite(IN PTEEHANDLE handle, IN const void *buffer, IN size_t
 		*numberOfBytesWritten = rc;
 
 	status = TEE_SUCCESS;
+End:
+	FUNC_EXIT(status);
+	return status;
+}
+
+TEESTATUS TEEAPI TeeFWStatus(IN PTEEHANDLE handle,
+			     IN uint32_t fwStatusNum, OUT uint32_t *fwStatus)
+{
+	struct mei *me = to_mei(handle);
+	TEESTATUS status;
+        uint32_t fwsts;
+	int rc;
+
+	FUNC_ENTRY();
+
+	if (!me || !fwStatus) {
+		status = TEE_INVALID_PARAMETER;
+		ERRPRINT("One of the parameters was illegal");
+		goto End;
+	}
+	if (fwStatusNum > MAX_FW_STATUS_NUM) {
+		status = TEE_INVALID_PARAMETER;
+		ERRPRINT("fwStatusNum should be 0..5");
+		goto End;
+	}
+
+	rc  = mei_fwstatus(me, fwStatusNum, &fwsts);
+	if (rc < 0) {
+		status = errno2status(rc);
+		ERRPRINT("fw status failed with status %d %s\n", rc, strerror(rc));
+		goto End;
+	}
+
+	*fwStatus = fwsts;
+	status = TEE_SUCCESS;
+
 End:
 	FUNC_EXIT(status);
 	return status;

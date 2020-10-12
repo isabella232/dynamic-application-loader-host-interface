@@ -1,14 +1,14 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 /*
- * Copyright (C) 2014-2019 Intel Corporation
+ * Copyright (C) 2014-2020 Intel Corporation
  */
 #include <assert.h>
 #include <windows.h>
 #include <initguid.h>
-#include <tchar.h>
 #include "helpers.h"
 #include "Public.h"
 #include "metee.h"
+#include "metee_win.h"
 #include <cfgmgr32.h>
 #include <Objbase.h>
 #include <Devpkey.h>
@@ -28,7 +28,8 @@
 **		TEE_INVALID_PARAMETER
 **		TEE_INTERNAL_ERROR
 */
-TEESTATUS TEEAPI BeginOverlappedInternal(IN TEE_OPERATION operation, IN HANDLE handle, IN PVOID buffer, IN ULONG bufferSize, OUT PEVENTHANDLE evt)
+TEESTATUS BeginOverlappedInternal(IN TEE_OPERATION operation, IN HANDLE handle,
+		                  IN PVOID buffer, IN ULONG bufferSize, OUT PEVENTHANDLE evt)
 {
 	TEESTATUS       status          = INIT_STATUS;
 	EVENTHANDLE     pOverlapped     = NULL;
@@ -60,12 +61,14 @@ TEESTATUS TEEAPI BeginOverlappedInternal(IN TEE_OPERATION operation, IN HANDLE h
 
 
 	if (operation == ReadOperation) {
-		if (ReadFile(handle, buffer, bufferSize, &bytesTransferred, (LPOVERLAPPED)pOverlapped)) {
+		if (ReadFile(handle, buffer, bufferSize, &bytesTransferred,
+			     (LPOVERLAPPED)pOverlapped)) {
 			optSuccesed = TRUE;
 		}
 	}
 	else if (operation == WriteOperation) {
-		if (WriteFile(handle, buffer, bufferSize, &bytesTransferred, (LPOVERLAPPED)pOverlapped)) {
+		if (WriteFile(handle, buffer, bufferSize, &bytesTransferred,
+			      (LPOVERLAPPED)pOverlapped)) {
 			optSuccesed = TRUE;
 		}
 	}
@@ -104,7 +107,8 @@ Cleanup:
 
 }
 
-TEESTATUS TEEAPI EndOverlapped(IN HANDLE handle, IN EVENTHANDLE evt, IN DWORD miliseconds, OUT OPTIONAL LPDWORD pNumberOfBytesTransferred)
+TEESTATUS EndOverlapped(IN HANDLE handle, IN EVENTHANDLE evt, IN DWORD milliseconds,
+			OUT OPTIONAL LPDWORD pNumberOfBytesTransferred)
 {
 	TEESTATUS       status                  = INIT_STATUS;
 	DWORD           err                     = ERROR_INTERNAL_ERROR;
@@ -123,7 +127,7 @@ TEESTATUS TEEAPI EndOverlapped(IN HANDLE handle, IN EVENTHANDLE evt, IN DWORD mi
 	pBytesTransferred = pNumberOfBytesTransferred ? pNumberOfBytesTransferred : &bytesTransferred;
 
 	// wait for the answer
-	err = WaitForSingleObject(evt->hEvent, miliseconds);
+	err = WaitForSingleObject(evt->hEvent, milliseconds);
 	if (err == WAIT_TIMEOUT) {
 		status = TEE_TIMEOUT;
 		ERRPRINT("WaitForSingleObject timed out!\n");
@@ -172,7 +176,8 @@ DWORD WINAPI WaitForOperationEnd(LPVOID lpThreadParameter)
 		goto exit;
 	}	
 
-	status = EndOverlapped(pOpContext->handle, pOpContext->pOverlapped, INFINITE, &bytesTransferred);
+	status = EndOverlapped(pOpContext->handle, pOpContext->pOverlapped,
+			       INFINITE, &bytesTransferred);
 
 	if (pOpContext->completionRoutine)
 		pOpContext->completionRoutine(status, (size_t)bytesTransferred);
@@ -184,21 +189,23 @@ exit:
 	return status;
 }
 
-TEESTATUS TEEAPI EndReadInternal(IN HANDLE handle, IN EVENTHANDLE evt, DWORD miliseconds, OUT OPTIONAL LPDWORD pNumberOfBytesRead)
+TEESTATUS EndReadInternal(IN HANDLE handle, IN EVENTHANDLE evt, DWORD milliseconds,
+			  OUT OPTIONAL LPDWORD pNumberOfBytesRead)
 
 {
 	TEESTATUS status = INIT_STATUS;
 
 	FUNC_ENTRY();
 
-	status = EndOverlapped(handle, evt, miliseconds, pNumberOfBytesRead);
+	status = EndOverlapped(handle, evt, milliseconds, pNumberOfBytesRead);
 
 	FUNC_EXIT(status);
 
 	return status;
 }
 
-TEESTATUS TEEAPI BeginReadInternal(IN HANDLE handle, IN PVOID buffer, IN ULONG bufferSize, OUT PEVENTHANDLE evt)
+TEESTATUS BeginReadInternal(IN HANDLE handle,
+			    IN PVOID buffer, IN ULONG bufferSize, OUT PEVENTHANDLE evt)
 
 {
 	TEESTATUS status = INIT_STATUS;
@@ -212,7 +219,8 @@ TEESTATUS TEEAPI BeginReadInternal(IN HANDLE handle, IN PVOID buffer, IN ULONG b
 	return status;
 }
 
-TEESTATUS TEEAPI BeginWriteInternal(IN HANDLE handle, IN const PVOID buffer, IN ULONG bufferSize, OUT PEVENTHANDLE evt)
+TEESTATUS BeginWriteInternal(IN HANDLE handle,
+			     IN const PVOID buffer, IN ULONG bufferSize, OUT PEVENTHANDLE evt)
 {
 	TEESTATUS status = INIT_STATUS;
 
@@ -225,20 +233,22 @@ TEESTATUS TEEAPI BeginWriteInternal(IN HANDLE handle, IN const PVOID buffer, IN 
 	return status;
 }
 
-TEESTATUS TEEAPI EndWriteInternal(IN HANDLE handle, IN EVENTHANDLE evt, DWORD miliseconds, OUT OPTIONAL LPDWORD pNumberOfBytesWritten)
+TEESTATUS EndWriteInternal(IN HANDLE handle, IN EVENTHANDLE evt, DWORD milliseconds,
+			   OUT OPTIONAL LPDWORD pNumberOfBytesWritten)
 {
 	TEESTATUS status = INIT_STATUS;
 
 	FUNC_ENTRY();
 
-	status = EndOverlapped(handle, evt, miliseconds, pNumberOfBytesWritten);
+	status = EndOverlapped(handle, evt, milliseconds, pNumberOfBytesWritten);
 
 	FUNC_EXIT(status);
 
 	return status;
 }
 
-TEESTATUS TEEAPI BeginOverlapped(IN TEE_OPERATION operation, IN PTEEHANDLE handle, IN PVOID buffer, IN ULONG bufferSize, IN LPTEE_COMPLETION_ROUTINE completionRoutine)
+TEESTATUS BeginOverlapped(IN TEE_OPERATION operation, IN PTEEHANDLE handle, IN PVOID buffer,
+			  IN ULONG bufferSize, IN LPTEE_COMPLETION_ROUTINE completionRoutine)
 {
 	TEESTATUS               status                  = INIT_STATUS;
 	TEESTATUS               tempStatus              = INIT_STATUS;
@@ -273,7 +283,8 @@ TEESTATUS TEEAPI BeginOverlapped(IN TEE_OPERATION operation, IN PTEEHANDLE handl
 	}
 
 	if (operation == ReadOperation) {
-		if (!ReadFile(handle->handle, buffer, bufferSize, &bytesTransferred, (LPOVERLAPPED)pOverlapped)) {
+		if (!ReadFile(handle->handle, buffer, bufferSize, &bytesTransferred,
+			      (LPOVERLAPPED)pOverlapped)) {
 			status = (TEESTATUS)GetLastError();
 			ERRPRINT("Error in ReadFile, error: %d\n", status);
 			goto Cleanup;
@@ -283,7 +294,8 @@ TEESTATUS TEEAPI BeginOverlapped(IN TEE_OPERATION operation, IN PTEEHANDLE handl
 		}
 	}
 	else if (operation == WriteOperation) {
-		if (!WriteFile(handle->handle, buffer, bufferSize, &bytesTransferred, (LPOVERLAPPED)pOverlapped)) {
+		if (!WriteFile(handle->handle, buffer, bufferSize, &bytesTransferred,
+			       (LPOVERLAPPED)pOverlapped)) {
 			status = (TEESTATUS)GetLastError();
 			ERRPRINT("Error in WriteFile, error: %d\n", status);
 			goto Cleanup;
@@ -294,7 +306,8 @@ TEESTATUS TEEAPI BeginOverlapped(IN TEE_OPERATION operation, IN PTEEHANDLE handl
 	}
 
 	if (!status) {
-		tempStatus = (TEESTATUS)GetLastError();  //we don't want to change the main status b/c IO_PENDING us OK
+		//we don't want to change the main status b/c IO_PENDING us OK
+		tempStatus = (TEESTATUS)GetLastError();
 
 		// it's ok to get an error here, because it's overlapped
 		if (ERROR_IO_PENDING != tempStatus) {
@@ -358,10 +371,11 @@ Cleanup:
 **		TEE_INVALID_PARAMETER
 **		TEE_INTERNAL_ERROR
 */
-TEESTATUS GetDevicePath(_In_ LPCGUID InterfaceGuid, _Out_writes_(pathSize) PTCHAR path, _In_ SIZE_T pathSize)
+TEESTATUS GetDevicePath(_In_ LPCGUID InterfaceGuid,
+			_Out_writes_(pathSize) char *path, _In_ SIZE_T pathSize)
 {
-	CONFIGRET      cr						  = CR_SUCCESS;
-	PWSTR		  deviceInterfaceList         = NULL;
+	CONFIGRET     cr                          = CR_SUCCESS;
+	char         *deviceInterfaceList         = NULL;
 	ULONG         deviceInterfaceListLength   = 0;
 	HRESULT       hr                          = E_FAIL;
 	TEESTATUS     status                      = TEE_INTERNAL_ERROR;
@@ -376,9 +390,9 @@ TEESTATUS GetDevicePath(_In_ LPCGUID InterfaceGuid, _Out_writes_(pathSize) PTCHA
 
 	path[0] = 0x00;
 
-	cr = CM_Get_Device_Interface_List_Size(
+	cr = CM_Get_Device_Interface_List_SizeA(
 		&deviceInterfaceListLength,
-		(LPGUID)&GUID_DEVINTERFACE_HECI,
+		(LPGUID)InterfaceGuid,
 		NULL,
 		CM_GET_DEVICE_INTERFACE_LIST_PRESENT);
 	if (cr != CR_SUCCESS) {
@@ -393,16 +407,16 @@ TEESTATUS GetDevicePath(_In_ LPCGUID InterfaceGuid, _Out_writes_(pathSize) PTCHA
 		goto Cleanup;
 	}
 
-	deviceInterfaceList = (PWSTR)malloc(deviceInterfaceListLength * sizeof(WCHAR));
+	deviceInterfaceList = (char*)malloc(deviceInterfaceListLength * sizeof(char));
 	if (deviceInterfaceList == NULL) {
 		ERRPRINT("Error allocating memory for device interface list.\n");
 		status = TEE_INTERNAL_ERROR;
 		goto Cleanup;
 	}
-	ZeroMemory(deviceInterfaceList, deviceInterfaceListLength * sizeof(WCHAR));
+	ZeroMemory(deviceInterfaceList, deviceInterfaceListLength * sizeof(char));
 
-	cr = CM_Get_Device_Interface_List(
-		(LPGUID)&GUID_DEVINTERFACE_HECI,
+	cr = CM_Get_Device_Interface_ListA(
+		(LPGUID)InterfaceGuid,
 		NULL,
 		deviceInterfaceList,
 		deviceInterfaceListLength,
@@ -413,7 +427,7 @@ TEESTATUS GetDevicePath(_In_ LPCGUID InterfaceGuid, _Out_writes_(pathSize) PTCHA
 		goto Cleanup;
 	}
 
-	hr = StringCchCopy(path, pathSize, deviceInterfaceList);
+	hr = StringCchCopyA(path, pathSize, deviceInterfaceList);
 	if (FAILED(hr)) {
 		status = TEE_INTERNAL_ERROR;
 		ERRPRINT("Error: StringCchCopy failed with HRESULT 0x%x", hr);
@@ -432,7 +446,9 @@ Cleanup:
 	return status;
 }
 
-TEESTATUS SendIOCTL(IN HANDLE handle, IN DWORD ioControlCode, IN LPVOID pInBuffer, IN DWORD inBufferSize, IN LPVOID pOutBuffer, IN DWORD outBufferSize, OUT LPDWORD pBytesRetuned)
+TEESTATUS SendIOCTL(IN HANDLE handle, IN DWORD ioControlCode,
+		    IN LPVOID pInBuffer, IN DWORD inBufferSize,
+		    IN LPVOID pOutBuffer, IN DWORD outBufferSize, OUT LPDWORD pBytesRetuned)
 {
 	OVERLAPPED      overlapped = {0}; // it's OK to put the overlapped in the stack here
 	TEESTATUS       status     = INIT_STATUS;
@@ -486,7 +502,7 @@ Cleanup:
 
 TEESTATUS Win32ErrorToTee(_In_ DWORD win32Error)
 {
-	switch(win32Error) {
+	switch (win32Error) {
 	case ERROR_INVALID_HANDLE:
 		return TEE_INVALID_PARAMETER;
 	case ERROR_INSUFFICIENT_BUFFER:

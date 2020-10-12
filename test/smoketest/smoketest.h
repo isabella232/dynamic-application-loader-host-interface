@@ -122,11 +122,6 @@ using std::vector;
 
 #define ECHO_ENCRYPTED_FILENAME FILEPREFIX("/OemEncryptedEchoInstall.acp")
 
-	//SGX applet
-	//#define ECHO_APP_ID "afc6721e506e45a99368663027934feb"
-	//#define ECHO_FILENAME FILEPREFIX("/sgx.dalp")
-	//#define ECHO_FILENAME_TO_PRINT "sgx applet"
-
 #define ECHO_1_APP_ID "d1de41d82b844feaa7fa1e4322f15de1"
 #define SIG_VERSION_2K_APPLET_SIGNING 1
 #define SIG_VERSION_3K_APPLET_SIGNING 2

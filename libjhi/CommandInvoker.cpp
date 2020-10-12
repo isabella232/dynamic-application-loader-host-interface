@@ -1553,7 +1553,7 @@ cleanup:
 
 		TEE_STATUS ret = TEE_STATUS_INTERNAL_ERROR;
 		JHI_RESPONSE* res = NULL;
-		JHI_COMMAND cmd = {0};
+		JHI_COMMAND cmd = {0, 0, 0};
 		uint8_t* inputBuffer = NULL;
 		uint8_t* outputBuffer = NULL;
 		uint32_t outputBufferSize = 0;

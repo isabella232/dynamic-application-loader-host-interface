@@ -1,12 +1,12 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright(c) 2013 - 2019 Intel Corporation. All rights reserved.
+ * Copyright(c) 2013 - 2020 Intel Corporation. All rights reserved.
  *
  * Intel Management Engine Interface (Intel MEI) Library
  */
 /*! \file libmei.h
-    \brief mei library API
+ *  \brief mei library API
  */
 #ifndef __LIBMEI_H__
 #define __LIBMEI_H__
@@ -27,19 +27,20 @@ extern "C" {
 
 /*! Library API version
  */
-#define LIBMEI_API_VERSION MEI_ENCODE_VERSION(1, 1)
+#define LIBMEI_API_VERSION MEI_ENCODE_VERSION(1, 4)
 
 /*! Get current supported library API version
  *
  * \return version value
  */
-unsigned int mei_get_api_version();
+unsigned int mei_get_api_version(void);
 
 /*! ME client connection state
  */
 enum mei_cl_state {
 	MEI_CL_STATE_ZERO = 0,          /**< reserved */
-	MEI_CL_STATE_INTIALIZED = 1,    /**< client is initialized */
+	MEI_CL_STATE_INTIALIZED = 1,    /**< client is initialized (typo) */
+	MEI_CL_STATE_INITIALIZED = 1,   /**< client is initialized */
 	MEI_CL_STATE_CONNECTED,         /**< client is connected */
 	MEI_CL_STATE_DISCONNECTED,      /**< client is disconnected */
 	MEI_CL_STATE_NOT_PRESENT,       /**< client with GUID is not present in the system */
@@ -58,11 +59,18 @@ struct mei {
 	int last_err;           /**< saved errno */
 	bool notify_en;         /**< notification is enabled */
 	bool verbose;           /**< verbose execution */
+	bool close_on_exit;     /**< close handle on deinit */
+	char *device;           /**< device name */
 };
+
+/*! Default name of mei device
+ */
+#define MEI_DEFAULT_DEVICE_NAME "mei0"
 
 /*! Default path to mei device
  */
-#define MEI_DEFAULT_DEVICE "/dev/mei"
+#define MEI_DEFAULT_DEVICE_PREFIX "/dev/"
+#define MEI_DEFAULT_DEVICE (MEI_DEFAULT_DEVICE_PREFIX MEI_DEFAULT_DEVICE_NAME)
 
 /*! Allocate and initialize me handle structure
  *
@@ -74,6 +82,18 @@ struct mei {
  *         must be with this handle. NULL on failure.
  */
 struct mei *mei_alloc(const char *device, const uuid_le *guid,
+		unsigned char req_protocol_version, bool verbose);
+
+/*! Allocate and initialize me handle structure
+ *
+ *  \param fd open file descriptor of MEI device
+ *  \param guid UUID/GUID of associated mei client
+ *  \param req_protocol_version minimal required protocol version, 0 for any
+ *  \param verbose print verbose output to console
+ *  \return me handle to the mei device. All subsequent calls to the lib's functions
+ *         must be with this handle. NULL on failure.
+ */
+struct mei *mei_alloc_fd(int fd, const uuid_le *guid,
 		unsigned char req_protocol_version, bool verbose);
 
 /*! Free me handle structure
@@ -94,6 +114,20 @@ void mei_free(struct mei *me);
  */
 int mei_init(struct mei *me, const char *device, const uuid_le *guid,
 		unsigned char req_protocol_version, bool verbose);
+
+/*! Initializes a mei connection
+ *
+ *  \param me A handle to the mei device. All subsequent calls to the lib's functions
+ *         must be with this handle
+ *  \param fd open file descriptor of MEI device
+ *  \param guid UUID/GUID of associated mei client
+ *  \param req_protocol_version minimal required protocol version, 0 for any
+ *  \param verbose print verbose output to a console
+ *  \return 0 if successful, otherwise error code
+ */
+int mei_init_fd(struct mei *me, int fd, const uuid_le *guid,
+		unsigned char req_protocol_version, bool verbose);
+
 
 /*! Closes the session to me driver
  *  Make sure that you call this function as soon as you are done with the device,
@@ -163,6 +197,16 @@ int mei_notification_request(struct mei *me, bool enable);
  *  in case the event notification was not enabled
  */
 int mei_notification_get(struct mei *me);
+
+/*! Obtains FW status of device
+ *
+ *  \param me The mei handle
+ *  \param fwsts_num The FW status register number (0-5).
+ *  \param fwsts FW status to fill
+ *  \return 0 if successful, otherwise error code
+ */
+int mei_fwstatus(struct mei *me, uint32_t fwsts_num, uint32_t *fwsts);
+
 
 #ifdef __cplusplus
 }

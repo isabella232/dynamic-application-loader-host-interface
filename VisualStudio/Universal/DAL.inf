@@ -61,20 +61,18 @@ CopyFiles = DAL_Files.amd64
 
 [DALInstallSection.ntamd64.Services]
 AddService = , 0x00000002
-AddService = jhi_service, %SPSVCSINST_STARTSERVICE%, DAL_Service_Inst, DalEventLog_prov_inst, Application
+AddService = jhi_service, %SPSVCSINST_STARTSERVICE%, DAL_Service_Inst, DalEventLog_prov_inst, Application, IntelDalJhi
 
 [DALInstallSection.ntamd64.Interfaces]
 AddInterface="{3C4852D6-D47B-4F46-B05E-B5EDC1AA440E}", , DALInterfaceSection
 
 ; For event logs translation
-[DALInstallSection.ntamd64.Events]
-AddEventProvider={EB9BA5A7-5E8F-4126-9A9A-E4BECBAC10F0},DalEventLog_prov_inst
-
 [DalEventLog_prov_inst]
-ProviderName=IntelDalJhi
-ResourceFile=%13%\jhi_service.exe
-MessageFile=%13%\jhi_service.exe
-Enabled=1
+AddReg = DalEventLog_AddReg
+
+[DalEventLog_AddReg]
+HKR,,EventMessageFile, %FLG_ADDREG_TYPE_EXPAND_SZ%, %13%\jhi_service.exe
+HKR,,TypesSupported, %FLG_ADDREG_TYPE_DWORD%, 7
 
 [DALInterfaceSection]
 AddReg=DALInterfaceSection_AddReg

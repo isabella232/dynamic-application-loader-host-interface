@@ -135,7 +135,7 @@ namespace intel_dal
 				GlobalsManager::Instance().waitForResetComplete();
 #ifndef ANDROID
 		}
-		catch (std::exception ex)
+		catch (std::exception & ex)
 		{
 			TRACE0("Exception raised in JHI service:");
 			TRACE1("%s\n",ex.what());

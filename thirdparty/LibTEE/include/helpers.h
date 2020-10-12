@@ -9,7 +9,7 @@
 #include <windows.h>
 #include <stdio.h>
 #include <stdarg.h>
-#include "metee_win.h"
+#include "metee.h"
 
 	#if _DEBUG
 		#define PRINTS_ENABLE
@@ -22,13 +22,17 @@
 
 	static void DebugPrint(const char* args, ...)
 	{
-		char msg[DEBUG_MSG_LEN];
+		char msg[DEBUG_MSG_LEN + 1];
 		va_list varl;
 		va_start(varl, args);
 		vsprintf_s(msg, DEBUG_MSG_LEN, args, varl);
 		va_end(varl);
 
+	#ifdef SYSLOG
 		OutputDebugStringA(msg);
+	#else
+		fprintf(stderr, "%s", msg);
+	#endif /* SYSLOG */
 	}
 
 	#define ErrorPrint(fmt, ...) DebugPrint(fmt, __VA_ARGS__)
