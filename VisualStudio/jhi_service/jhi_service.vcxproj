@@ -606,6 +606,7 @@
       <AdditionalDependencies>Ws2_32.lib;Setupapi.lib;Rpcrt4.lib;Wintrust.lib;Crypt32.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <DelayLoadDLLs>Ws2_32.dll;Setupapi.dll;Rpcrt4.dll;Wintrust.dll;Crypt32.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <AdditionalOptions>/SAFESEH /INTEGRITYCHECK%(AdditionalOptions)</AdditionalOptions>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)..\common\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -637,6 +638,7 @@
       <DelayLoadDLLs>
       </DelayLoadDLLs>
       <IgnoreSpecificDefaultLibraries>kernel32.lib</IgnoreSpecificDefaultLibraries>
+      <AdditionalOptions>/SAFESEH /INTEGRITYCHECK%(AdditionalOptions)</AdditionalOptions>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)..\common\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -666,6 +668,7 @@
       <AdditionalDependencies>Ws2_32.lib;Setupapi.lib;Rpcrt4.lib;Wintrust.lib;Crypt32.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <DelayLoadDLLs>Ws2_32.dll;Setupapi.dll;Rpcrt4.dll;Wintrust.dll;Crypt32.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <AdditionalOptions>/INTEGRITYCHECK %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)..\common\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -697,6 +700,7 @@
       <DelayLoadDLLs>
       </DelayLoadDLLs>
       <IgnoreSpecificDefaultLibraries>kernel32.lib</IgnoreSpecificDefaultLibraries>
+      <AdditionalOptions>/INTEGRITYCHECK %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)..\common\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -726,6 +730,7 @@
       <AdditionalDependencies>Ws2_32.lib;Setupapi.lib;Rpcrt4.lib;Wintrust.lib;Crypt32.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <DelayLoadDLLs>Ws2_32.dll;Setupapi.dll;Rpcrt4.dll;Wintrust.dll;Crypt32.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <AdditionalOptions>/SAFESEH /INTEGRITYCHECK%(AdditionalOptions)</AdditionalOptions>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)..\common\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -755,6 +760,7 @@
       <AdditionalDependencies>Ws2_32.lib;Setupapi.lib;Rpcrt4.lib;Wintrust.lib;Crypt32.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <DelayLoadDLLs>Ws2_32.dll;Setupapi.dll;Rpcrt4.dll;Wintrust.dll;Crypt32.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <AdditionalOptions>/INTEGRITYCHECK %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)..\common\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>

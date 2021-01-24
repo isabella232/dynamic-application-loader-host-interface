@@ -459,7 +459,7 @@
       <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
     <Link>
-      <AdditionalOptions>/SAFESEH %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/SAFESEH /INTEGRITYCHECK%(AdditionalOptions)</AdditionalOptions>
       <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -491,7 +491,7 @@
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
-      <AdditionalOptions>/SAFESEH %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/SAFESEH /INTEGRITYCHECK%(AdditionalOptions)</AdditionalOptions>
       <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -524,7 +524,7 @@
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
-      <AdditionalOptions>/SAFESEH %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/SAFESEH /INTEGRITYCHECK%(AdditionalOptions)</AdditionalOptions>
       <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -601,6 +601,7 @@
       <TargetMachine>MachineX64</TargetMachine>
       <AdditionalDependencies>OneCoreUAP.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>kernel32.lib</IgnoreSpecificDefaultLibraries>
+      <AdditionalOptions>/INTEGRITYCHECK</AdditionalOptions>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)..\common\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -636,6 +637,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX64</TargetMachine>
       <AdditionalDependencies>Rpcrt4.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>/INTEGRITYCHECK %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)..\common\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -647,6 +649,9 @@
       <SDLCheck>true</SDLCheck>
       <ControlFlowGuard>Guard</ControlFlowGuard>
     </ClCompile>
+    <Link>
+      <AdditionalOptions>/INTEGRITYCHECK %(AdditionalOptions)</AdditionalOptions>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
